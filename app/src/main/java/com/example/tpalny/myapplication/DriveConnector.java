@@ -58,6 +58,12 @@ public abstract class DriveConnector extends Activity implements
          * {@code ConnectionCallbacks} and {@code OnConnectionFailedListener} on the
          * activities itself.
          */
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+        }
+
         @Override
         protected void onResume() {
                 super.onResume();
@@ -136,9 +142,9 @@ public abstract class DriveConnector extends Activity implements
         /**
          * Shows a toast message.
          */
-        public void showMessage(String message) {
+        /*public void showMessage(String message) {
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        }
+        }*/
 
         /**
          * Getter for the {@code GoogleApiClient}.

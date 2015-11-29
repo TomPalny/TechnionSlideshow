@@ -1,42 +1,25 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#001bcc"
-    tools:context="com.example.tpalny.myapplication.Select_Folders">
-
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
-    <LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="#001bcc"
+        tools:context="com.example.tpalny.myapplication.Select_Folders">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:layout_gravity="center_horizontal">
-
-            <ImageView
-                android:layout_width="310dp"
-                android:layout_height="110dp"
-                android:src="@drawable/google_drive_logo"
-                />
-
-            <TextView
+        <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/My_Title"
-                android:text=" Slideshow"
+                android:text="Slideshow"
                 android:textSize="60sp"
                 android:textColor="#fa08d4d7"
                 android:typeface="serif"
                 android:textStyle="bold"
-                android:layout_gravity="center"/>
-
-        </LinearLayout>
+                android:layout_gravity="center"
+                android:padding="10dp"
+            android:layout_marginTop="20sp"
+            android:drawableLeft="@drawable/google_drive_logo"
+            android:drawableStart="@drawable/google_drive_logo"/>
 
 
         <TextView
@@ -53,7 +36,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="40dp">
+            android:layout_marginTop="30sp"
+            android:padding="10sp">
 
             <TextView
                 android:layout_width="0dp"
@@ -64,7 +48,8 @@
                 android:textSize="30sp"
                 android:textColor="#ffffff"
                 android:textStyle="bold"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 />
 
             <Button
@@ -74,6 +59,7 @@
                 android:text="Click to Choose Folder"
                 android:textSize="20sp"
                 android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
                 android:onClick="onPicturesSelectClicked"/>
         </LinearLayout>
 
@@ -99,6 +85,7 @@
                 android:textColor="@android:color/background_light"
                 android:textSize="25sp"
                 android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
                 android:textStyle="italic"/>
 
 
@@ -109,7 +96,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="40dp">
+            android:padding="10sp">
 
             <TextView
                 android:layout_width="0dp"
@@ -120,7 +107,8 @@
                 android:textSize="30sp"
                 android:textColor="#ffffff"
                 android:textStyle="bold"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp"
                 />
 
             <Button
@@ -130,6 +118,7 @@
                 android:text="Click to Choose Folder"
                 android:textSize="20sp"
                 android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
                 android:onClick="onTextSelectClicked"/>
         </LinearLayout>
 
@@ -144,7 +133,8 @@
                 android:text="You've Selected: "
                 android:textColor="@android:color/background_light"
                 android:textSize="25sp"
-                android:layout_marginLeft="30dp"/>
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -154,6 +144,7 @@
                 android:textColor="@android:color/background_light"
                 android:textSize="25sp"
                 android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
                 android:textStyle="italic"/>
 
 
@@ -164,12 +155,11 @@
             android:layout_height="70dp"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:id="@+id/Start_Slideshow_Button"
             android:background="@drawable/play"
             android:onClick="onPlaySlideshowClicked"/>
 
 
-    </LinearLayout>
+</LinearLayout>
 
-</FrameLayout>
