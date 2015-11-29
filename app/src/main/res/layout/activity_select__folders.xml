@@ -1,0 +1,174 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#001bcc"
+    tools:context="com.example.tpalny.myapplication.Select_Folders">
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_gravity="center_horizontal">
+
+            <ImageView
+                android:layout_width="310dp"
+                android:layout_height="110dp"
+                android:src="@drawable/google_drive_logo"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/My_Title"
+                android:text=" Slideshow"
+                android:textSize="60dp"
+                android:textColor="#fa08d4d7"
+                android:typeface="serif"
+                android:textStyle="bold"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/Developer"
+            android:text="Developed by Tom Palny"
+            android:layout_gravity="center"
+            android:textSize="40dp"
+            android:textColor="#ff9500"
+            android:textStyle="italic"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="40dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:id="@+id/Instructions"
+                android:text="Please select the PICTURES folder: "
+                android:textSize="30dp"
+                android:textColor="#ffffff"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Click to Choose Folder"
+                android:textSize="20dp"
+                android:layout_marginRight="10dp"
+                android:onClick="onPicturesSelectClicked"/>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="You've Selected: "
+                android:textColor="@android:color/background_light"
+                android:textSize="25dp"
+                android:layout_marginLeft="30dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/Selected_Image_Folder"
+                android:text="None Selected"
+                android:textColor="@android:color/background_light"
+                android:textSize="25dp"
+                android:layout_marginLeft="30dp"
+                android:textStyle="italic"/>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="40dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:id="@+id/Instructions2"
+                android:text="Please select the TEXT folder, or leave blank: "
+                android:textSize="30dp"
+                android:textColor="#ffffff"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Click to Choose Folder"
+                android:textSize="20dp"
+                android:layout_marginRight="10dp"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="You've Selected: "
+                android:textColor="@android:color/background_light"
+                android:textSize="25dp"
+                android:layout_marginLeft="30dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/Selected_Text_Folder"
+                android:text="None Selected"
+                android:textColor="@android:color/background_light"
+                android:textSize="25dp"
+                android:layout_marginLeft="30dp"
+                android:textStyle="italic"/>
+
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:textSize="20dp"
+            android:id="@+id/Start_Slideshow_Button"
+            android:background="@drawable/play"
+            />
+
+
+    </LinearLayout>
+
+</FrameLayout>
