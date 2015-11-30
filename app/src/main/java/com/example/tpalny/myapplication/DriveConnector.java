@@ -59,10 +59,10 @@ public abstract class DriveConnector extends Activity implements
          * activities itself.
          */
 
-        @Override
+        /*@Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-        }
+        }*/
 
         @Override
         protected void onResume() {
@@ -78,6 +78,8 @@ public abstract class DriveConnector extends Activity implements
                 }
                 mGoogleApiClient.connect();
         }
+
+
 
         /**
          * Handles resolution callbacks.
