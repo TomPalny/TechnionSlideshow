@@ -1,14 +1,14 @@
 package com.example.tpalny.myapplication;
 
-import android.app.Activity;
+//import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
+//import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
+//import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +25,8 @@ import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResource;
 import com.google.android.gms.drive.OpenFileActivityBuilder;
 
-public class Select_Folders extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class Select_Folders extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleApiClient mGoogleApiClient;
     private IntentSender intentSender;
@@ -75,6 +76,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         }
         super.onPause();
     }*/
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -115,11 +117,11 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 @Override
                 public void onResult(DriveResource.MetadataResult metadataResult) {
                     String folderName = metadataResult.getMetadata().getTitle();
-                    TextView textView=null;
-                    if (requestCode == REQUEST_CODE_IMAGE_OPENER){
+                    TextView textView = null;
+                    if (requestCode == REQUEST_CODE_IMAGE_OPENER) {
                         textView = (TextView) findViewById(R.id.Selected_Image_Folder);
                         slideShowButton.setEnabled(true);
-                    }else if (requestCode == REQUEST_CODE_TEXT_OPENER) {
+                    } else if (requestCode == REQUEST_CODE_TEXT_OPENER) {
                         textView = (TextView) findViewById(R.id.Selected_Text_Folder);
                     }
 
@@ -127,7 +129,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
                 }
             });
-            switch(requestCode) {
+            switch (requestCode) {
                 case REQUEST_CODE_IMAGE_OPENER:
 
 
@@ -146,7 +148,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         //mGoogleApiClient.connect();
         intentSender = Drive.DriveApi
                 .newOpenFileActivityBuilder()
-                .setMimeType(new String[] { DriveFolder.MIME_TYPE })
+                .setMimeType(new String[]{DriveFolder.MIME_TYPE})
                 .build(mGoogleApiClient);
         try {
             startIntentSenderForResult(
@@ -159,7 +161,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     public void onTextSelectClicked(View view) {
         intentSender = Drive.DriveApi
                 .newOpenFileActivityBuilder()
-                .setMimeType(new String[] { DriveFolder.MIME_TYPE })
+                .setMimeType(new String[]{DriveFolder.MIME_TYPE})
                 .build(mGoogleApiClient);
         try {
             startIntentSenderForResult(
@@ -173,9 +175,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     }
 
-        @Override
+    @Override
     public void onConnected(Bundle bundle) {
-    Log.i("SELECT_FOLDERS", "Google API Client is Connected");
+        Log.i("SELECT_FOLDERS", "Google API Client is Connected");
     }
 
     @Override
@@ -190,7 +192,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         if (mResolvingError) {
             // Already attempting to resolve an error.
             return;
-        }else if (result.hasResolution()) {
+        } else if (result.hasResolution()) {
             try {
                 mResolvingError = true;
                 result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
@@ -221,7 +223,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         Bundle args = new Bundle();
         args.putInt(DIALOG_ERROR, errorCode);
         dialogFragment.setArguments(args);
-        dialogFragment.show(getFragmentManager() , "errorDialog");
+        dialogFragment.show(getFragmentManager(), "errorDialog");
     }
 
     /* Called from ErrorDialogFragment when the dialog is dismissed. */
@@ -231,7 +233,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     /* A fragment to display an error dialog */
     public static class ErrorDialogFragment extends DialogFragment {
-        public ErrorDialogFragment() { }
+        public ErrorDialogFragment() {
+        }
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
