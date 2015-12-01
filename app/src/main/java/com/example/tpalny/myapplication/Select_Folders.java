@@ -1,6 +1,7 @@
 package com.example.tpalny.myapplication;
 
 //import android.app.Activity;
+
 import android.app.Dialog;
 import android.app.DialogFragment;
 //import android.app.Fragment;
@@ -35,6 +36,11 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private boolean mResolvingError = false;
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     private static final String DIALOG_ERROR = "dialog_error";
+    private boolean textWasSelected = false;
+    private boolean picturesWereSelected = false;
+    private TextView pictureSelectionText;
+    private TextView textSelectionText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +48,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         setContentView(R.layout.activity_select__folders);
         slideShowButton = (Button) findViewById(R.id.Start_Slideshow_Button);
         slideShowButton.setEnabled(false);
+        slideShowButton.setAlpha(.5f);
+        pictureSelectionText = (TextView) findViewById(R.id.Selected_Image_Folder);
+        textSelectionText = (TextView) findViewById(R.id.Selected_Text_Folder);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Drive.API)
@@ -117,21 +126,22 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 @Override
                 public void onResult(DriveResource.MetadataResult metadataResult) {
                     String folderName = metadataResult.getMetadata().getTitle();
-                    TextView textView = null;
+
                     if (requestCode == REQUEST_CODE_IMAGE_OPENER) {
-                        textView = (TextView) findViewById(R.id.Selected_Image_Folder);
+                        pictureSelectionText.setText(folderName);
                         slideShowButton.setEnabled(true);
+                        slideShowButton.setAlpha(1);
+                        picturesWereSelected = true;
                     } else if (requestCode == REQUEST_CODE_TEXT_OPENER) {
-                        textView = (TextView) findViewById(R.id.Selected_Text_Folder);
+                        textSelectionText.setText(folderName);
+                        textWasSelected = true;
                     }
 
-                    textView.setText(folderName);
 
                 }
             });
             switch (requestCode) {
                 case REQUEST_CODE_IMAGE_OPENER:
-
 
                     break;
                 case REQUEST_CODE_TEXT_OPENER:
@@ -229,6 +239,18 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     /* Called from ErrorDialogFragment when the dialog is dismissed. */
     public void onDialogDismissed() {
         mResolvingError = false;
+    }
+
+    public void onClearPicturesClicked(View view) {
+        picturesWereSelected = false;
+        slideShowButton.setEnabled(false);
+        slideShowButton.setAlpha(.5f);
+        pictureSelectionText.setText("None Selected");
+    }
+
+    public void onClearTextClicked(View view) {
+        textWasSelected = false;
+        textSelectionText.setText("None Selected");
     }
 
     /* A fragment to display an error dialog */

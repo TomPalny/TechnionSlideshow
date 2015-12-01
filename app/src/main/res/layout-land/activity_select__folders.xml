@@ -93,6 +93,17 @@
                     android:layout_marginStart="30dp"
                     android:textStyle="italic"/>
 
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Clear Selection"
+                    android:textSize="20sp"
+                    android:layout_marginLeft="20sp"
+                    android:layout_marginStart="20sp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:onClick="onClearPicturesClicked"/>
+
 
             </LinearLayout>
 
@@ -152,6 +163,16 @@
                     android:layout_marginStart="30dp"
                     android:textStyle="italic"/>
 
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Clear Selection"
+                    android:textSize="20sp"
+                    android:layout_marginLeft="20sp"
+                    android:layout_marginStart="20sp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:onClick="onClearTextClicked"/>
 
             </LinearLayout>
 
