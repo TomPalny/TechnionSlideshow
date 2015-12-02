@@ -1,15 +1,11 @@
 package com.example.tpalny.myapplication;
 
-//import android.app.Activity;
-
 import android.app.Dialog;
 import android.app.DialogFragment;
-//import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.support.v4.app.FragmentActivity;
-//import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,10 +17,18 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResource;
+import com.google.android.gms.drive.Metadata;
+import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.OpenFileActivityBuilder;
+import com.google.android.gms.drive.query.Filters;
+import com.google.android.gms.drive.query.Query;
+import com.google.android.gms.drive.query.SearchableField;
+import com.google.android.gms.drive.DriveApi.MetadataBufferResult;
+
 
 public class Select_Folders extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -40,6 +44,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private boolean picturesWereSelected = false;
     private TextView pictureSelectionText;
     private TextView textSelectionText;
+
 
 
     @Override
@@ -121,25 +126,31 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             DriveId driveId = data.getParcelableExtra(
                     OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
 
-            DriveFolder driveFolder = driveId.asDriveFolder();
-            driveFolder.getMetadata(mGoogleApiClient).setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
-                @Override
-                public void onResult(DriveResource.MetadataResult metadataResult) {
-                    String folderName = metadataResult.getMetadata().getTitle();
+            final DriveFolder driveFolder = driveId.asDriveFolder();
+            driveFolder.getMetadata(mGoogleApiClient)
+                    .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
+                        @Override
+                        public void onResult(DriveResource.MetadataResult metadataResult) {
+                            String folderName = metadataResult.getMetadata().getTitle();
 
-                    if (requestCode == REQUEST_CODE_IMAGE_OPENER) {
-                        pictureSelectionText.setText(folderName);
-                        slideShowButton.setEnabled(true);
-                        slideShowButton.setAlpha(1);
-                        picturesWereSelected = true;
-                    } else if (requestCode == REQUEST_CODE_TEXT_OPENER) {
-                        textSelectionText.setText(folderName);
-                        textWasSelected = true;
-                    }
+                            if (requestCode == REQUEST_CODE_IMAGE_OPENER) {
+                                pictureSelectionText.setText(folderName);
+                                slideShowButton.setEnabled(true);
+                                slideShowButton.setAlpha(1);
+                                picturesWereSelected = true;
+                                Query query = new Query.Builder()
+                                        .addFilter(Filters.eq(SearchableField.MIME_TYPE, "image/jpeg"))
+                                        .build();
+                                driveFolder.queryChildren(mGoogleApiClient, query)
+                                        .setResultCallback(metadataCallback);
+                            } else if (requestCode == REQUEST_CODE_TEXT_OPENER) {
+                                textSelectionText.setText(folderName);
+                                textWasSelected = true;
+                            }
 
 
-                }
-            });
+                        }
+                    });
             switch (requestCode) {
                 case REQUEST_CODE_IMAGE_OPENER:
 
@@ -153,6 +164,17 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             }
         }
     }
+
+    private ResultCallback<MetadataBufferResult> metadataCallback = new ResultCallback<MetadataBufferResult>() {
+        @Override
+        public void onResult(MetadataBufferResult metadataBufferResult) {
+            if (!metadataBufferResult.getStatus().isSuccess()){
+                Log.i("onResult", " Problem retrieving files");
+             }
+            //TODO: Get the file list and URLs
+        }
+    };
+
 
     public void onPicturesSelectClicked(View view) {
         //mGoogleApiClient.connect();
