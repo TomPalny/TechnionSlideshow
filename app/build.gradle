@@ -28,4 +28,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-drive:8.3.0'
     compile 'com.google.api-client:google-api-client-android:1.20.0'
     compile 'com.google.http-client:google-http-client-gson:1.20.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
 }

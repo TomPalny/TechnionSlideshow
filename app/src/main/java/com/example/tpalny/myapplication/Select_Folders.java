@@ -4,7 +4,6 @@ import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -53,7 +52,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private GoogleApiClient mGoogleApiClient;
     private IntentSender intentSender;
     private Button slideShowButton;
-    //protected static final int REQUEST_CODE_RESOLUTION = 1;
     private boolean mResolvingError = false;
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     private static final int REQUEST_RESOLVE_ERROR = 1001;
@@ -71,6 +69,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private static GoogleAccountCredential mCredential;
     private static String folderName = null;
     private static String folderID = null;
+    public static List<String> imagesList;
+    public static List<String> textList;
 
 
     @Override
@@ -185,22 +185,21 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         }
 
         /**
-         * Fetch a list of up to 10 file names and IDs.
-         *
          * @return List of Strings describing files, or an empty list if no files
          * found.
          * @throws IOException
          */
         private List<String> getDataFromApi() throws IOException {
-            List<String> fileInfo = new ArrayList<>();
+
+
             FileList result = null;
             if (mFolderId != null) {
-                if (mIsImage){
+                if (mIsImage) {
                     result = mGOOSvc.files().list().setQ("'" + mFolderId +
                             "' in parents and mimeType contains 'image/' and trashed = false")
                             .execute();
                 }
-                if(mIsText){
+                if (mIsText) {
                     result = mGOOSvc.files().list().setQ("'" + mFolderId + "'" +
                             " in parents and mimeType = 'text/plain'" +
                             " and mimeType = 'application/msword'" +
@@ -209,19 +208,30 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                             .execute();
                 }
 
-            }
-            else{
+            } else {
                 result = mGOOSvc.files().list().setQ("mimeType contains 'image/' and trashed = false")
                         .execute();
             }
             List<File> files = result.getItems();
             if (files != null) {
-                for (File file : files) {
-                    fileInfo.add(String.format("%s (%s)\n",
-                            file.getTitle(), file.getId()));
+                if (mIsImage) {
+                    imagesList = new ArrayList<>();
+                    for (File file : files) {
+                        imagesList.add(String.format("%s",
+                                file.getWebContentLink()));
+                    }
+                    return imagesList;
+                }
+                if (mIsText) {
+                    textList = new ArrayList<>();
+                    for (File file : files) {
+                        textList.add(String.format("%s",
+                                file.getWebContentLink()));
+                    }
+                    return textList;
                 }
             }
-            return fileInfo;
+            return imagesList;
         }
 
 
@@ -230,11 +240,11 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             if (output == null || output.size() == 0) {
                 new AlertDialog.Builder(getApplicationContext())
                         .setMessage("No results returned.").show();
-            } else {
+            } /*else {
                 output.add(0, "Data retrieved using the Drive API:");
                 new AlertDialog.Builder(Select_Folders.this)
                         .setMessage(TextUtils.join("\n", output)).show();
-            }
+            }*/
         }
 
         @Override
@@ -385,11 +395,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                                                 .setMessage("No network connection available.").show();
                                     }
 
-                                /*Query query = new Query.Builder()
-                                        .addFilter(Filters.eq(SearchableField.MIME_TYPE, "image/jpeg"))
-                                        .build();
-                                driveFolder.queryChildren(mGoogleApiClient, query)
-                                        .setResultCallback(metadataCallback);*/
+
                                 } else if (requestCode == REQUEST_CODE_TEXT_OPENER) {
                                     textSelectionText.setText(folderName);
                                     textWasSelected = true;
@@ -408,20 +414,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
         }
     }
-
-    /*private ResultCallback<MetadataBufferResult> metadataCallback = new ResultCallback<MetadataBufferResult>() {
-        @Override
-        public void onResult(MetadataBufferResult metadataBufferResult) {
-            if (!metadataBufferResult.getStatus().isSuccess()) {
-                Log.i("onResult", " Problem retrieving files");
-            }
-            //TODO: Get the file list and URLs
-            MetadataBuffer mb = metadataBufferResult.getMetadataBuffer();
-
-
-        }
-    };*/
-
 
     public void onPicturesSelectClicked(View view) {
         if (!mGoogleApiClient.isConnecting() &&
@@ -453,8 +445,22 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         }
     }
 
-    public void onPlaySlideshowClicked(View view) {
 
+    public void onClearPicturesClicked(View view) {
+        picturesWereSelected = false;
+        slideShowButton.setEnabled(false);
+        slideShowButton.setAlpha(.5f);
+        pictureSelectionText.setText("None Selected");
+    }
+
+    public void onClearTextClicked(View view) {
+        textWasSelected = false;
+        textSelectionText.setText("None Selected");
+    }
+
+    public void onPlaySlideshowClicked(View view) {
+        Intent intent = new Intent(this, FullscreenSlideshow.class);
+        startActivity(intent);
     }
 
     @Override
@@ -513,18 +519,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         mResolvingError = false;
     }
 
-    public void onClearPicturesClicked(View view) {
-        picturesWereSelected = false;
-        slideShowButton.setEnabled(false);
-        slideShowButton.setAlpha(.5f);
-        pictureSelectionText.setText("None Selected");
-    }
-
-    public void onClearTextClicked(View view) {
-        textWasSelected = false;
-        textSelectionText.setText("None Selected");
-    }
-
     /* A fragment to display an error dialog */
     public static class ErrorDialogFragment extends DialogFragment {
         public ErrorDialogFragment() {
@@ -544,49 +538,4 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         }
     }
 
-    /************************************************************************************************
-     * find file/folder in GOODrive
-     *
-     * @param prnId parent ID (optional), null searches full drive, "root" searches Drive root
-     * @param titl  file/folder name (optional)
-     * @param mime  file/folder mime type (optional)
-     * @return arraylist of found objects
-     */
-    static ArrayList<ContentValues> search(String prnId, String titl, String mime) {
-        ArrayList<ContentValues> gfs = new ArrayList<>();
-        if (mGOOSvc != null) try {
-            // add query conditions, build query
-            String qryClause = "'me' in owners and ";
-            if (prnId != null) qryClause += "'" + prnId + "' in parents and ";
-            if (titl != null) qryClause += "title = '" + titl + "' and ";
-            if (mime != null) qryClause += "mimeType = '" + mime + "' and ";
-            qryClause = qryClause.substring(0, qryClause.length() - " and ".length());
-            Drive.Files.List qry = mGOOSvc.files().list().setQ(qryClause)
-                    .setFields("items(id,mimeType,labels/trashed,title),nextPageToken");
-            String npTok = null;
-            if (qry != null) do {
-                FileList gLst = qry.execute();
-                if (gLst != null) {
-                    for (File gFl : gLst.getItems()) {
-                        if (gFl.getLabels().getTrashed()) continue;
-                        gfs.add(newCVs(gFl.getTitle(), gFl.getId(), gFl.getMimeType()));
-                    }                                                                 //else UT.lg("failed " + gFl.getTitle());
-                    npTok = gLst.getNextPageToken();
-                    qry.setPageToken(npTok);
-                }
-            }
-            while (npTok != null && npTok.length() > 0);                     //UT.lg("found " + vlss.size());
-        } catch (Exception e) {
-            Log.e("_X_", Log.getStackTraceString(e));
-        }
-        return gfs;
-    }
-
-    static ContentValues newCVs(String titl, String gdId, String mime) {
-        ContentValues cv = new ContentValues();
-        if (titl != null) cv.put("titl", titl);
-        if (gdId != null) cv.put("gdid", gdId);
-        if (mime != null) cv.put("mime", mime);
-        return cv;
-    }
 }

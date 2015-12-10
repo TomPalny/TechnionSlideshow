@@ -25,7 +25,8 @@
         </activity>
         <activity
             android:name=".FullscreenSlideshow"
-            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboardHidden|screenSize"
             android:label="@string/title_activity_fullscreen_slideshow"
             android:theme="@style/FullscreenTheme"></activity>
 
