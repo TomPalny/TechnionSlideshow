@@ -14,7 +14,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -64,7 +63,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private TextView textSelectionText;
     private static Drive mGOOSvc;
     //private static boolean mConnected;
-    private static String email = null;
     private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
     private static GoogleAccountCredential mCredential;
     private static String folderName = null;
@@ -90,6 +88,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 .addOnConnectionFailedListener(this)
                 .build();
         mGoogleApiClient.connect();
+
         SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
@@ -102,7 +101,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     @Override
     protected void onResume() {
         super.onResume();
-        //mConnected = false;
         if (isGooglePlayServicesAvailable()) {
             refreshResults();
         } else {
@@ -110,30 +108,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                     .setMessage("Google Play Services required: " +
                             "after installing, close and relaunch this app.").show();
         }
-        /*new AsyncTask<Void, Void, Exception>() {
-            @Override
-            protected Exception doInBackground(Void... nadas) {
-                try {
-                    // GoogleAuthUtil.getToken(mAct, email, DriveScopes.DRIVE_FILE);   SO 30122755
-                    mGOOSvc.files().get("root").setFields("title").execute();
-                    mConnected = true;
-                } catch (UserRecoverableAuthIOException uraIOEx) {  // standard authorization failure - user fixable
-                    return uraIOEx;
-                } catch (GoogleAuthIOException gaIOEx) {  // usually PackageName /SHA1 mismatch in DevConsole
-                    return gaIOEx;
-                } catch (IOException e) {   // '404 not found' in FILE scope, consider connected
-                    if (e instanceof GoogleJsonResponseException) {
-                        if (404 == ((GoogleJsonResponseException) e).getStatusCode())
-                            mConnected = true;
-                    }
-                } catch (Exception e) {  // "the name must not be empty" indicates
-                    Log.i("", "Something else went wrong in onResume()");        // UNREGISTERED / EMPTY account in 'setSelectedAccountName()' above
-                }
-                return null;
-            }
-        }.execute();*/
-
-
         if (!mGoogleApiClient.isConnecting() &&
                 !mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
@@ -201,9 +175,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 }
                 if (mIsText) {
                     result = mGOOSvc.files().list().setQ("'" + mFolderId + "'" +
-                            " in parents and mimeType = 'text/plain'" +
-                            " and mimeType = 'application/msword'" +
-                            " and mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'" +
+                            " in parents and (mimeType = 'text/plain'" +
+                            " or mimeType = 'application/msword'" +
+                            " or mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')" +
                             " and trashed = false")
                             .execute();
                 }
@@ -217,6 +191,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 if (mIsImage) {
                     imagesList = new ArrayList<>();
                     for (File file : files) {
+                        file.setShared(true);
                         imagesList.add(String.format("%s",
                                 file.getWebContentLink()));
                     }
@@ -238,8 +213,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         @Override
         protected void onPostExecute(List<String> output) {
             if (output == null || output.size() == 0) {
-                new AlertDialog.Builder(getApplicationContext())
-                        .setMessage("No results returned.").show();
+                new AlertDialog.Builder(Select_Folders.this)
+                        .setMessage("No results returned. Please try another folder").show();
             } /*else {
                 output.add(0, "Data retrieved using the Drive API:");
                 new AlertDialog.Builder(Select_Folders.this)
@@ -264,7 +239,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                                     + mLastError.getMessage()).show();
                 }
             } else {
-                new AlertDialog.Builder(getApplicationContext())
+                new AlertDialog.Builder(Select_Folders.this)
                         .setMessage("Request cancelled.").show();
             }
         }
@@ -351,7 +326,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             case REQUEST_ACCOUNT_PICKER:
                 if (resultCode == RESULT_OK && data != null &&
                         data.getExtras() != null) {
-                    email =
+                    String email =
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (email != null) {
                         mCredential.setSelectedAccountName(email);
