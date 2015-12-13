@@ -6,22 +6,18 @@
     tools:context="com.example.tpalny.myapplication.FullscreenSlideshow"
     >
 
-    <ViewFlipper
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/view_flipper">
+        android:id="@+id/my_image"
+        android:onClick="onImageClicked"/>
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/my_image"/>
 
-    </ViewFlipper>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/view_flipper"
+        android:layout_alignBottom="@id/my_image"
         android:layout_margin="@dimen/activity_vertical_margin"
         android:singleLine="true"
         android:textSize="40dp"

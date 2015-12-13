@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="30sp"
+                android:layout_marginTop="20sp"
                 android:padding="10sp">
 
                 <TextView
@@ -188,6 +188,40 @@
 
 
             </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="10sp"
+            android:paddingStart="10sp"
+            android:paddingRight="10sp"
+            android:paddingEnd="10sp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Set Slideshow Delay:"
+                android:textColor="@android:color/background_light"
+                android:textSize="25sp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"/>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/slideshow_delay"
+                android:hint="Number of Seconds"
+                android:textColorHint="@color/common_action_bar_splitter"
+                android:backgroundTint="@color/colorAccent"
+                android:inputType="number"
+                android:textSize="25sp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+                android:textStyle="italic"/>
+
+
+        </LinearLayout>
 
             <Button
                 android:layout_width="70dp"

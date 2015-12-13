@@ -17,8 +17,10 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -40,6 +42,7 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +52,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleApiClient mGoogleApiClient;
+    private static GoogleAccountCredential mCredential;
+    protected static Drive mGOOSvc;
     private IntentSender intentSender;
     private Button slideShowButton;
     private boolean mResolvingError = false;
@@ -61,14 +66,16 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private boolean picturesWereSelected = false;
     private TextView pictureSelectionText;
     private TextView textSelectionText;
-    private static Drive mGOOSvc;
+
     //private static boolean mConnected;
     private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
-    private static GoogleAccountCredential mCredential;
+
     private static String folderName = null;
     private static String folderID = null;
-    public static List<String> imagesList;
-    public static List<String> textList;
+    public static List<File> imagesList;
+    public static List<File> textList;
+    protected static DriveId globalDriveId;
+    protected static EditText slideShowDelay;
 
 
     @Override
@@ -80,6 +87,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         slideShowButton.setAlpha(.5f);
         pictureSelectionText = (TextView) findViewById(R.id.Selected_Image_Folder);
         textSelectionText = (TextView) findViewById(R.id.Selected_Text_Folder);
+        slideShowDelay = (EditText) findViewById(R.id.slideshow_delay);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(com.google.android.gms.drive.Drive.API)
@@ -127,7 +135,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     }
 
-    private class SearchTask extends AsyncTask<Void, Void, List<String>> {
+    private class SearchTask extends AsyncTask<Void, Void, List<File>> {
 
         private Exception mLastError = null;
         private String mFolderId = null;
@@ -148,7 +156,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
          * @param params no parameters needed for this task.
          */
         @Override
-        protected List<String> doInBackground(Void... params) {
+        protected List<File> doInBackground(Void... params) {
             try {
                 return getDataFromApi();
             } catch (Exception e) {
@@ -163,7 +171,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
          * found.
          * @throws IOException
          */
-        private List<String> getDataFromApi() throws IOException {
+        private List<File> getDataFromApi() throws IOException {
 
 
             FileList result = null;
@@ -191,17 +199,14 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 if (mIsImage) {
                     imagesList = new ArrayList<>();
                     for (File file : files) {
-                        file.setShared(true);
-                        imagesList.add(String.format("%s",
-                                file.getWebContentLink()));
+                        imagesList.add(file);
                     }
                     return imagesList;
                 }
                 if (mIsText) {
                     textList = new ArrayList<>();
                     for (File file : files) {
-                        textList.add(String.format("%s",
-                                file.getWebContentLink()));
+                        textList.add(file);
                     }
                     return textList;
                 }
@@ -211,7 +216,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
 
         @Override
-        protected void onPostExecute(List<String> output) {
+        protected void onPostExecute(List<File> output) {
             if (output == null || output.size() == 0) {
                 new AlertDialog.Builder(Select_Folders.this)
                         .setMessage("No results returned. Please try another folder").show();
@@ -280,9 +285,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     @Override
     protected void onPause() {
-        if (mGoogleApiClient != null) {
+        /*if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
-        }
+        }*/
         super.onPause();
     }
 
@@ -296,7 +301,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     @Override
     protected void onStop() {
-        mGoogleApiClient.disconnect();
+        //mGoogleApiClient.disconnect();
         super.onStop();
     }
 
@@ -349,6 +354,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             default:
                 final DriveId driveId = data.getParcelableExtra(
                         OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
+                globalDriveId = driveId;
 
                 final DriveFolder driveFolder = driveId.asDriveFolder();
                 driveFolder.getMetadata(mGoogleApiClient)
@@ -377,7 +383,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                                     if (isDeviceOnline()) {
                                         new SearchTask(mCredential, folderID, false, true).execute();
                                     } else {
-                                        new AlertDialog.Builder(getApplicationContext())
+                                        new AlertDialog.Builder(Select_Folders.this)
                                                 .setMessage("No network connection available.").show();
                                     }
                                 }
@@ -434,12 +440,20 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     }
 
     public void onPlaySlideshowClicked(View view) {
+        String delay = slideShowDelay.getText().toString();
+        if (delay.isEmpty() || delay.equals("0")){
+            new AlertDialog.Builder(this)
+                    .setMessage("Please enter a number greater than 0.").show();
+            return;
+        }
         Intent intent = new Intent(this, FullscreenSlideshow.class);
         startActivity(intent);
     }
 
     @Override
     public void onConnected(Bundle bundle) {
+        /*Glide.get(this).register(DriveId.class, InputStream.class,
+                new DriveIdModelLoader.Factory(mGoogleApiClient));*/
         Log.i("SELECT_FOLDERS", "Google API Client is Connected");
     }
 
