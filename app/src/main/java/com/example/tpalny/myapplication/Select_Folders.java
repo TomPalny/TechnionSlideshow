@@ -20,7 +20,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -42,7 +41,6 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,8 +49,10 @@ import java.util.List;
 public class Select_Folders extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+    private static final int MAXIMUM_ATTEMPTS_TO_CONNECT = 3;
+    private static final int REQUEST_CODE_RESOLUTION = 1004;
     private GoogleApiClient mGoogleApiClient;
-    private static GoogleAccountCredential mCredential;
+    protected static GoogleAccountCredential mCredential;
     protected static Drive mGOOSvc;
     private IntentSender intentSender;
     private Button slideShowButton;
@@ -71,7 +71,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
 
     private static String folderName = null;
-    private static String folderID = null;
+    protected static String folderID = null;
     public static List<File> imagesList;
     public static List<File> textList;
     protected static DriveId globalDriveId;
@@ -102,7 +102,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff())
                 .setSelectedAccountName(settings.getString("accountName", null));
-
+        mGOOSvc = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), mCredential)
+                .setApplicationName("Technion Slideshow App").build();
     }
 
 
@@ -135,120 +136,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     }
 
-    private class SearchTask extends AsyncTask<Void, Void, List<File>> {
-
-        private Exception mLastError = null;
-        private String mFolderId = null;
-        private Boolean mIsImage = false;
-        private Boolean mIsText = false;
-
-        public SearchTask(GoogleAccountCredential credential, String folderId, Boolean isImage, Boolean isText) {
-            mGOOSvc = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential)
-                    .setApplicationName("Technion Slideshow App").build();
-            mFolderId = folderId;
-            mIsImage = isImage;
-            mIsText = isText;
-        }
-
-        /**
-         * Background task to call Drive API.
-         *
-         * @param params no parameters needed for this task.
-         */
-        @Override
-        protected List<File> doInBackground(Void... params) {
-            try {
-                return getDataFromApi();
-            } catch (Exception e) {
-                mLastError = e;
-                cancel(true);
-                return null;
-            }
-        }
-
-        /**
-         * @return List of Strings describing files, or an empty list if no files
-         * found.
-         * @throws IOException
-         */
-        private List<File> getDataFromApi() throws IOException {
-
-
-            FileList result = null;
-            if (mFolderId != null) {
-                if (mIsImage) {
-                    result = mGOOSvc.files().list().setQ("'" + mFolderId +
-                            "' in parents and mimeType contains 'image/' and trashed = false")
-                            .execute();
-                }
-                if (mIsText) {
-                    result = mGOOSvc.files().list().setQ("'" + mFolderId + "'" +
-                            " in parents and (mimeType = 'text/plain'" +
-                            " or mimeType = 'application/msword'" +
-                            " or mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')" +
-                            " and trashed = false")
-                            .execute();
-                }
-
-            } else {
-                result = mGOOSvc.files().list().setQ("mimeType contains 'image/' and trashed = false")
-                        .execute();
-            }
-            List<File> files = result.getItems();
-            if (files != null) {
-                if (mIsImage) {
-                    imagesList = new ArrayList<>();
-                    for (File file : files) {
-                        imagesList.add(file);
-                    }
-                    return imagesList;
-                }
-                if (mIsText) {
-                    textList = new ArrayList<>();
-                    for (File file : files) {
-                        textList.add(file);
-                    }
-                    return textList;
-                }
-            }
-            return imagesList;
-        }
-
-
-        @Override
-        protected void onPostExecute(List<File> output) {
-            if (output == null || output.size() == 0) {
-                new AlertDialog.Builder(Select_Folders.this)
-                        .setMessage("No results returned. Please try another folder").show();
-            } /*else {
-                output.add(0, "Data retrieved using the Drive API:");
-                new AlertDialog.Builder(Select_Folders.this)
-                        .setMessage(TextUtils.join("\n", output)).show();
-            }*/
-        }
-
-        @Override
-        protected void onCancelled() {
-            if (mLastError != null) {
-                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());
-                } else if (mLastError instanceof UserRecoverableAuthIOException) {
-                    startActivityForResult(
-                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            Select_Folders.REQUEST_AUTHORIZATION);
-                } else {
-                    new AlertDialog.Builder(Select_Folders.this)
-                            .setMessage("The following error occurred:\n"
-                                    + mLastError.getMessage()).show();
-                }
-            } else {
-                new AlertDialog.Builder(Select_Folders.this)
-                        .setMessage("Request cancelled.").show();
-            }
-        }
-    }
 
     private boolean isDeviceOnline() {
         ConnectivityManager connMgr =
@@ -342,7 +229,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                         editor.apply();
                     }
                 } else if (resultCode == RESULT_CANCELED) {
-                    new AlertDialog.Builder(getApplicationContext())
+                    new AlertDialog.Builder(Select_Folders.this)
                             .setMessage("Account unspecified.").show();
                 }
                 break;
@@ -351,56 +238,66 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                     chooseAccount();
                 }
                 break;
-            default:
-                final DriveId driveId = data.getParcelableExtra(
-                        OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
-                globalDriveId = driveId;
-
-                final DriveFolder driveFolder = driveId.asDriveFolder();
-                driveFolder.getMetadata(mGoogleApiClient)
-                        .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
-                            @Override
-                            public void onResult(DriveResource.MetadataResult metadataResult) {
-                                folderName = metadataResult.getMetadata().getTitle();
-                                folderID = driveId.getResourceId();
-
-                                if (requestCode == REQUEST_CODE_IMAGE_OPENER) {
-                                    pictureSelectionText.setText(folderName);
-                                    slideShowButton.setEnabled(true);
-                                    slideShowButton.setAlpha(1);
-                                    picturesWereSelected = true;
-                                    if (isDeviceOnline()) {
-                                        new SearchTask(mCredential, folderID, true, false).execute();
-                                    } else {
-                                        new AlertDialog.Builder(getApplicationContext())
-                                                .setMessage("No network connection available.").show();
-                                    }
-
-
-                                } else if (requestCode == REQUEST_CODE_TEXT_OPENER) {
-                                    textSelectionText.setText(folderName);
-                                    textWasSelected = true;
-                                    if (isDeviceOnline()) {
-                                        new SearchTask(mCredential, folderID, false, true).execute();
-                                    } else {
-                                        new AlertDialog.Builder(Select_Folders.this)
-                                                .setMessage("No network connection available.").show();
-                                    }
-                                }
-
-
-                            }
-                        });
+            case REQUEST_CODE_IMAGE_OPENER:
+                pictureOrTextSelection(true, false, data);
                 break;
-
+            case REQUEST_CODE_TEXT_OPENER:
+                pictureOrTextSelection(false, true, data);
+                break;
         }
     }
 
+    private void pictureOrTextSelection(final boolean isImageCase, final boolean isTextCase, Intent data) {
+        if (data == null) return;
+        final DriveId driveId = data.getParcelableExtra(
+                OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
+        globalDriveId = driveId;
+
+        final DriveFolder driveFolder = driveId.asDriveFolder();
+        driveFolder.getMetadata(mGoogleApiClient)
+                .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
+                    @Override
+                    public void onResult(DriveResource.MetadataResult metadataResult) {
+                        folderName = metadataResult.getMetadata().getTitle();
+                        folderID = driveId.getResourceId();
+
+                        if (isImageCase) {
+                            pictureSelectionText.setText(folderName);
+                            slideShowButton.setEnabled(true);
+                            slideShowButton.setAlpha(1);
+                            picturesWereSelected = true;
+                            if (isDeviceOnline()) {
+                                new SearchTask(Select_Folders.this, true, false).execute();
+
+                            } else {
+                                new AlertDialog.Builder(getApplicationContext())
+                                        .setMessage("No network connection available.").show();
+                            }
+
+                        } else if (isTextCase) {
+                            textSelectionText.setText(folderName);
+                            textWasSelected = true;
+                            if (isDeviceOnline()) {
+                                new SearchTask(Select_Folders.this, false, true).execute();
+
+                            } else {
+                                new AlertDialog.Builder(Select_Folders.this)
+                                        .setMessage("No network connection available.").show();
+                            }
+                        }
+                    }
+                });
+    }
+
     public void onPicturesSelectClicked(View view) {
-        if (!mGoogleApiClient.isConnecting() &&
-                !mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
+        int x = 0;
+        while (x++ <= MAXIMUM_ATTEMPTS_TO_CONNECT) {
+            if (!mGoogleApiClient.isConnecting() &&
+                    !mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.connect();
+            }
         }
+
         intentSender = com.google.android.gms.drive.Drive.DriveApi
                 .newOpenFileActivityBuilder()
                 .setMimeType(new String[]{DriveFolder.MIME_TYPE})
@@ -414,6 +311,13 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     }
 
     public void onTextSelectClicked(View view) {
+        int x = 0;
+        while (x++ <= MAXIMUM_ATTEMPTS_TO_CONNECT) {
+            if (!mGoogleApiClient.isConnecting() &&
+                    !mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.connect();
+            }
+        }
         intentSender = com.google.android.gms.drive.Drive.DriveApi
                 .newOpenFileActivityBuilder()
                 .setMimeType(new String[]{DriveFolder.MIME_TYPE})
@@ -441,7 +345,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     public void onPlaySlideshowClicked(View view) {
         String delay = slideShowDelay.getText().toString();
-        if (delay.isEmpty() || delay.equals("0")){
+        if (delay.isEmpty() || delay.equals("0")) {
             new AlertDialog.Builder(this)
                     .setMessage("Please enter a number greater than 0.").show();
             return;
@@ -452,8 +356,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     @Override
     public void onConnected(Bundle bundle) {
-        /*Glide.get(this).register(DriveId.class, InputStream.class,
-                new DriveIdModelLoader.Factory(mGoogleApiClient));*/
         Log.i("SELECT_FOLDERS", "Google API Client is Connected");
     }
 
@@ -477,17 +379,15 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 // There was an error with the resolution intent. Try again.
                 mGoogleApiClient.connect();
             }
-            /*// show the localized error dialog.
-            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
-            return;*/
+            return;
         } else
             showErrorDialog(result.getErrorCode());
         mResolvingError = true;
-        /*try {
+        try {
             result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
         } catch (IntentSender.SendIntentException e) {
             Log.e(TAG, "Exception while starting resolution activity", e);
-        }*/
+        }
     }
 
     // The rest of this code is all about building the error dialog
