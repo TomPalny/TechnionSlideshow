@@ -100,8 +100,7 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         if (Select_Folders.imagesList.size()==0){
-            new AlertDialog.Builder(mContext)
-                    .setMessage("No results returned. Please try another folder").show();
+            Toast.makeText(mContext, "No matching files in folder.", Toast.LENGTH_LONG ).show();
 
         }
     }

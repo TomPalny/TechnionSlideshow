@@ -49,7 +49,7 @@ import java.util.List;
 public class Select_Folders extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final int MAXIMUM_ATTEMPTS_TO_CONNECT = 3;
+    private static final int MAXIMUM_ATTEMPTS_TO_CONNECT = 4;
     private static final int REQUEST_CODE_RESOLUTION = 1004;
     private GoogleApiClient mGoogleApiClient;
     protected static GoogleAccountCredential mCredential;

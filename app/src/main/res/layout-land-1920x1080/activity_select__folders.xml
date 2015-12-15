@@ -2,236 +2,233 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.tpalny.myapplication.Select_Folders"
-    android:background="#001bcc">
+    android:background="#001bcc"
+    tools:context="com.example.tpalny.myapplication.Select_Folders">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-            android:orientation="vertical">
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/My_Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20sp"
+            android:drawableLeft="@drawable/google_drive_logo"
+            android:drawableStart="@drawable/google_drive_logo"
+            android:padding="10dp"
+            android:text="Slideshow"
+            android:textColor="#fa08d4d7"
+            android:textSize="60sp"
+            android:textStyle="bold"
+            android:typeface="serif" />
+
+
+        <TextView
+            android:id="@+id/Developer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Developed by Tom Palny"
+            android:textColor="#ff9500"
+            android:textSize="40sp"
+            android:textStyle="italic" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30sp"
+            android:orientation="horizontal"
+            android:padding="10sp">
 
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/My_Title"
-                    android:text="Slideshow"
-                    android:textSize="60sp"
-                    android:textColor="#fa08d4d7"
-                    android:typeface="serif"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"
-                    android:padding="10dp"
-                android:layout_marginTop="20sp"
-                android:drawableLeft="@drawable/google_drive_logo"
-                android:drawableStart="@drawable/google_drive_logo"/>
-
-
-            <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/Instructions"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/Developer"
-                android:text="Developed by Tom Palny"
-                android:layout_gravity="center"
-                android:textSize="40sp"
-                android:textColor="#ff9500"
-                android:textStyle="italic"/>
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_weight="2"
+                android:text="Please select the PICTURES folder: "
+                android:textColor="#ffffff"
+                android:textSize="30sp"
+                android:textStyle="bold" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <Button
+                android:layout_width="20dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="20sp"
-                android:padding="10sp">
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@color/common_action_bar_splitter"
+                android:onClick="onPicturesSelectClicked"
+                android:text="Click to Choose Folder"
+                android:textSize="20sp" />
+        </LinearLayout>
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:id="@+id/Instructions"
-                    android:text="Please select the PICTURES folder: "
-                    android:textSize="30sp"
-                    android:textColor="#ffffff"
-                    android:textStyle="bold"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginStart="20dp"
-                    />
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Click to Choose Pictures"
-                    android:background="@color/common_action_bar_splitter"
-                    android:textSize="20sp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:onClick="onPicturesSelectClicked"/>
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="10sp"
-                android:paddingStart="10sp"
-                android:paddingRight="10sp"
-                android:paddingEnd="10sp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="You've Selected: "
-                    android:textColor="@android:color/background_light"
-                    android:textSize="25sp"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginStart="30dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/Selected_Image_Folder"
-                    android:text="None Selected"
-                    android:textColor="@android:color/background_light"
-                    android:textSize="25sp"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginStart="30dp"
-                    android:textStyle="italic"/>
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Clear Selection"
-                    android:background="@color/common_action_bar_splitter"
-                    android:textSize="20sp"
-                    android:layout_marginLeft="220dp"
-                    android:layout_marginStart="220dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:onClick="onClearPicturesClicked"/>
-
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="10sp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="2"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/Instructions2"
-                    android:text="Please select the TEXT folder, or leave blank: "
-                    android:textSize="30sp"
-                    android:textColor="#ffffff"
-                    android:textStyle="bold"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginStart="15dp"
-                    />
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:background="@color/common_action_bar_splitter"
-                    android:text="Click to Choose Text"
-                    android:textSize="20sp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:onClick="onTextSelectClicked"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="10sp"
-                android:paddingStart="10sp"
-                android:paddingRight="10sp"
-                android:paddingEnd="10sp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="You've Selected: "
-                    android:textColor="@android:color/background_light"
-                    android:textSize="25sp"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginStart="30dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/Selected_Text_Folder"
-                    android:text="None Selected"
-                    android:textColor="@android:color/background_light"
-                    android:textSize="25sp"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginStart="30dp"
-                    android:textStyle="italic"/>
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Clear Selection"
-                    android:background="@color/common_action_bar_splitter"
-                    android:textSize="20sp"
-                    android:layout_marginLeft="225dp"
-                    android:layout_marginStart="225dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:onClick="onClearTextClicked"/>
-
-
-            </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingLeft="10sp"
-            android:paddingStart="10sp"
-            android:paddingRight="10sp"
-            android:paddingEnd="10sp">
+            android:padding="10sp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Set Slideshow Delay:"
-                android:textColor="@android:color/background_light"
-                android:textSize="25sp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginStart="30dp"/>
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/slideshow_delay"
-                android:hint="Number of Seconds"
-                android:textColorHint="@color/common_action_bar_splitter"
-                android:backgroundTint="@color/colorAccent"
-                android:inputType="number"
-                android:textSize="25sp"
                 android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
-                android:textStyle="italic"/>
+                android:layout_weight="1"
+                android:text="You've Selected: "
+                android:textColor="@android:color/background_light"
+                android:textSize="25sp" />
+
+            <TextView
+                android:id="@+id/Selected_Image_Folder"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+                android:layout_weight="1"
+                android:text="None Selected"
+                android:textColor="@android:color/background_light"
+                android:textSize="25sp"
+                android:textStyle="italic" />
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginLeft="20sp"
+                android:layout_marginRight="10dp"
+                android:layout_marginStart="20sp"
+                android:layout_weight="1"
+                android:background="@color/common_action_bar_splitter"
+                android:onClick="onClearPicturesClicked"
+                android:text="Clear Selection"
+                android:textSize="20sp" />
 
 
         </LinearLayout>
 
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10sp">
+
+            <TextView
+                android:id="@+id/Instructions2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp"
+                android:layout_weight="2"
+                android:text="Please select the TEXT folder, or leave blank: "
+                android:textColor="#ffffff"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
             <Button
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:textSize="20sp"
-                android:id="@+id/Start_Slideshow_Button"
-                android:background="@drawable/play"
-                android:onClick="onPlaySlideshowClicked"/>
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@color/common_action_bar_splitter"
+                android:onClick="onTextSelectClicked"
+                android:text="Click to Choose Folder"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+                android:layout_weight="1"
+                android:text="You've Selected: "
+                android:textColor="@android:color/background_light"
+                android:textSize="25sp" />
+
+            <TextView
+                android:id="@+id/Selected_Text_Folder"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+                android:layout_weight="1"
+                android:text="None Selected"
+                android:textColor="@android:color/background_light"
+                android:textSize="25sp"
+                android:textStyle="italic" />
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginLeft="20sp"
+                android:layout_marginRight="10dp"
+                android:layout_marginStart="20sp"
+                android:layout_weight="1"
+                android:background="@color/common_action_bar_splitter"
+                android:onClick="onClearTextClicked"
+                android:text="Clear Selection"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingEnd="10sp"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
+            android:paddingStart="10sp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+                android:text="Set Slideshow Delay:"
+                android:textColor="@android:color/background_light"
+                android:textSize="25sp" />
+
+            <EditText
+                android:id="@+id/slideshow_delay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+                android:hint="type the number of seconds here"
+                android:inputType="number"
+                android:textColor="#7dfd60"
+                android:textColorHint="#fffafa"
+                android:textSize="25sp"
+                android:textStyle="italic" />
+
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/Start_Slideshow_Button"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/play"
+            android:onClick="onPlaySlideshowClicked"
+            android:textSize="20sp" />
 
 
     </LinearLayout>

@@ -74,10 +74,8 @@ public class FullscreenSlideshow extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Bitmap bm) {
-            if (bm == null) {
-                cancelTimerAndReturn();
-            }
-            if (currentPic == Select_Folders.imagesList.size()) {
+
+            if (currentPic == Select_Folders.imagesList.size() || bm == null) {
                 new SearchTask(FullscreenSlideshow.this, true, false).execute();
             }
 
