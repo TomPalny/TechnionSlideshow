@@ -11,14 +11,16 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -31,19 +33,16 @@ import com.google.android.gms.drive.DriveResource;
 import com.google.android.gms.drive.OpenFileActivityBuilder;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class Select_Folders extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
@@ -51,6 +50,11 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     private static final int MAXIMUM_ATTEMPTS_TO_CONNECT = 4;
     private static final int REQUEST_CODE_RESOLUTION = 1004;
+    private static final String PICS_FOLDER_NAME_TAG = "pics_folder_name";
+    private static final String TEXT_FOLDER_NAME_TAG = "text_folder_name";
+    protected static final String START_ON_BOOT = "start_on_boot";
+    private static final String PICS_DRIVEID = "pics_driveID";
+    private static final String TEXT_DRIVEID = "text_driveID";
     private GoogleApiClient mGoogleApiClient;
     protected static GoogleAccountCredential mCredential;
     protected static Drive mGOOSvc;
@@ -64,18 +68,25 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private static final String DIALOG_ERROR = "dialog_error";
     private boolean textWasSelected = false;
     private boolean picturesWereSelected = false;
+    protected static Boolean userCancelledSlideshow = false;
     private TextView pictureSelectionText;
     private TextView textSelectionText;
+    private final String PICTURES_FOLDER_TAG = "pictures_folder";
+    private final String TEXT_FOLDER_TAG = "text_folder";
+    private final String DELAY_TAG = "delay";
 
     //private static boolean mConnected;
     private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
 
-    private static String folderName = null;
-    protected static String folderID = null;
+    private static String picturesFolderName = null;
+    protected static String picturesFolderID = null;
     public static List<File> imagesList;
     public static List<File> textList;
-    protected static DriveId globalDriveId;
     protected static EditText slideShowDelay;
+    private SharedPreferences settings;
+    protected static String textFolderID = null;
+    private String textFolderName = null;
+    private ToggleButton toggle;
 
 
     @Override
@@ -97,7 +108,26 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 .build();
         mGoogleApiClient.connect();
 
-        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+        settings = getSharedPreferences("com.example.tpalny.myapplication_preferences", Context.MODE_PRIVATE);
+        connectToGoogleService();
+
+        toggle = (ToggleButton) findViewById(R.id.boot_start);
+        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editor = settings.edit();
+                if (isChecked) {
+                    editor.putString(START_ON_BOOT, "true").apply();
+
+                } else {
+                    editor.putString(START_ON_BOOT, "false").apply();
+
+                }
+            }
+        });
+
+    }
+
+    private void connectToGoogleService() {
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff())
@@ -110,6 +140,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     @Override
     protected void onResume() {
         super.onResume();
+
         if (isGooglePlayServicesAvailable()) {
             refreshResults();
         } else {
@@ -117,23 +148,86 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                     .setMessage("Google Play Services required: " +
                             "after installing, close and relaunch this app.").show();
         }
-        if (!mGoogleApiClient.isConnecting() &&
-                !mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
+
+        String chosenFolder = settings.getString(PICTURES_FOLDER_TAG, "");
+        if (!chosenFolder.isEmpty() && !userCancelledSlideshow) {
+            populateFieldsWithExistingData();
         }
+    }
+
+    private void populateFieldsWithExistingData() {
+        String driveIdDecode = settings.getString(PICS_DRIVEID, "");
+        if (driveIdDecode.isEmpty()) {
+            return;
+        }
+        final DriveId picsDriveId = DriveId.decodeFromString(driveIdDecode);
+        final DriveFolder picsDriveFolder = picsDriveId.asDriveFolder();
+        picsDriveFolder.getMetadata(mGoogleApiClient)
+                .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
+                    @Override
+                    public void onResult(DriveResource.MetadataResult metadataResult) {
+                        picturesFolderName = settings.getString(PICS_FOLDER_NAME_TAG, "");
+                        pictureSelectionText.setText(picturesFolderName);
+                        picturesFolderID = picsDriveId.getResourceId();
+                        slideShowButton.setEnabled(true);
+                        slideShowButton.setAlpha(1);
+                        picturesWereSelected = true;
+                        if (isDeviceOnline()) {
+                            new SearchTask(Select_Folders.this, true, false).execute();
+
+                        } else {
+                            new AlertDialog.Builder(getApplicationContext())
+                                    .setMessage("No network connection available.").show();
+                        }
+                    }
+                });
+
+        textFolderID = settings.getString(TEXT_FOLDER_TAG, "");
+        if (!textFolderID.isEmpty()) {
+            driveIdDecode = settings.getString(TEXT_DRIVEID, "");
+            if (driveIdDecode.isEmpty()) {
+                return;
+            }
+            final DriveId textDriveId = DriveId.decodeFromString(driveIdDecode);
+            final DriveFolder textDriveFolder = textDriveId.asDriveFolder();
+            textDriveFolder.getMetadata(mGoogleApiClient)
+                    .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
+                        @Override
+                        public void onResult(DriveResource.MetadataResult metadataResult) {
+                            textFolderName = settings.getString(TEXT_FOLDER_NAME_TAG, "");
+                            textSelectionText.setText(textFolderName);
+                            textFolderID = textDriveId.getResourceId();
+                            textWasSelected = true;
+                            if (isDeviceOnline()) {
+                                new SearchTask(Select_Folders.this, false, true).execute();
+
+                            } else {
+                                new AlertDialog.Builder(getApplicationContext())
+                                        .setMessage("No network connection available.").show();
+                            }
+                        }
+                    });
+
+
+        }
+        String delay = settings.getString(DELAY_TAG, "");
+        slideShowDelay.setText(delay);
+        toggle.setChecked(settings.getString(START_ON_BOOT, "").equals("true"));
+        final Intent intent = new Intent(this, FullscreenSlideshow.class);
+        TimerTask tt = new TimerTask() {
+            @Override
+            public void run() {
+                startActivity(intent);
+            }
+        };
+        Timer timer = new Timer();
+        timer.schedule(tt, 5000);
     }
 
     private void refreshResults() {
         if (mCredential.getSelectedAccountName() == null) {
             chooseAccount();
         }
-            /*if (isDeviceOnline()) {
-                new SearchTask(mCredential, folderID, false, false).execute();
-            } else {
-                new AlertDialog.Builder(getApplicationContext())
-                        .setMessage("No network connection available.").show();
-            }*/
-
     }
 
 
@@ -181,7 +275,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     @Override
     protected void onStart() {
         super.onStart();
-        if (!mResolvingError) {  // more about this later
+        if (!mResolvingError) {
             mGoogleApiClient.connect();
         }
     }
@@ -222,11 +316,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (email != null) {
                         mCredential.setSelectedAccountName(email);
-                        SharedPreferences settings =
-                                getPreferences(Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = settings.edit();
-                        editor.putString("accountName", email);
-                        editor.apply();
+                        editor.putString("accountName", email).apply();
                     }
                 } else if (resultCode == RESULT_CANCELED) {
                     new AlertDialog.Builder(Select_Folders.this)
@@ -251,18 +342,28 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         if (data == null) return;
         final DriveId driveId = data.getParcelableExtra(
                 OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
-        globalDriveId = driveId;
+        final SharedPreferences.Editor editor = settings.edit();
+        if (isImageCase) {
+            editor.putString(PICS_DRIVEID, driveId.encodeToString()).apply();
+        }
+        if (isTextCase) {
+            editor.putString(TEXT_DRIVEID, driveId.encodeToString()).apply();
+        }
+
 
         final DriveFolder driveFolder = driveId.asDriveFolder();
         driveFolder.getMetadata(mGoogleApiClient)
                 .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
                     @Override
                     public void onResult(DriveResource.MetadataResult metadataResult) {
-                        folderName = metadataResult.getMetadata().getTitle();
-                        folderID = driveId.getResourceId();
+
 
                         if (isImageCase) {
-                            pictureSelectionText.setText(folderName);
+                            picturesFolderName = metadataResult.getMetadata().getTitle();
+                            picturesFolderID = driveId.getResourceId();
+                            editor.putString(PICTURES_FOLDER_TAG, picturesFolderID).apply();
+                            editor.putString(PICS_FOLDER_NAME_TAG, picturesFolderName).apply();
+                            pictureSelectionText.setText(picturesFolderName);
                             slideShowButton.setEnabled(true);
                             slideShowButton.setAlpha(1);
                             picturesWereSelected = true;
@@ -275,7 +376,11 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                             }
 
                         } else if (isTextCase) {
-                            textSelectionText.setText(folderName);
+                            textFolderName = metadataResult.getMetadata().getTitle();
+                            textFolderID = driveId.getResourceId();
+                            editor.putString(TEXT_FOLDER_TAG, textFolderID).apply();
+                            editor.putString(TEXT_FOLDER_NAME_TAG, textFolderName).apply();
+                            textSelectionText.setText(textFolderName);
                             textWasSelected = true;
                             if (isDeviceOnline()) {
                                 new SearchTask(Select_Folders.this, false, true).execute();
@@ -290,13 +395,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     }
 
     public void onPicturesSelectClicked(View view) {
-        int x = 0;
-        while (x++ <= MAXIMUM_ATTEMPTS_TO_CONNECT) {
-            if (!mGoogleApiClient.isConnecting() &&
-                    !mGoogleApiClient.isConnected()) {
-                mGoogleApiClient.connect();
-            }
-        }
+        reconnectToGoogleApi();
 
         intentSender = com.google.android.gms.drive.Drive.DriveApi
                 .newOpenFileActivityBuilder()
@@ -307,6 +406,16 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                     intentSender, REQUEST_CODE_IMAGE_OPENER, null, 0, 0, 0);
         } catch (IntentSender.SendIntentException e) {
             Log.w(TAG, "Unable to send intent", e);
+        }
+    }
+
+    private void reconnectToGoogleApi() {
+        int x = 0;
+        while (x++ <= MAXIMUM_ATTEMPTS_TO_CONNECT) {
+            if (!mGoogleApiClient.isConnecting() &&
+                    !mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.connect();
+            }
         }
     }
 
@@ -336,11 +445,17 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         slideShowButton.setEnabled(false);
         slideShowButton.setAlpha(.5f);
         pictureSelectionText.setText("None Selected");
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(PICS_FOLDER_NAME_TAG, "").apply();
+        editor.putString(PICTURES_FOLDER_TAG, "").apply();
     }
 
     public void onClearTextClicked(View view) {
         textWasSelected = false;
         textSelectionText.setText("None Selected");
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(TEXT_FOLDER_NAME_TAG, "").apply();
+        editor.putString(TEXT_FOLDER_TAG, "").apply();
     }
 
     public void onPlaySlideshowClicked(View view) {
@@ -350,6 +465,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                     .setMessage("Please enter a number greater than 0.").show();
             return;
         }
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(DELAY_TAG, delay).apply();
         Intent intent = new Intent(this, FullscreenSlideshow.class);
         startActivity(intent);
     }
