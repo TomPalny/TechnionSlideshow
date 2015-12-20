@@ -56,12 +56,13 @@
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/select_pics_button"
                 android:layout_width="20dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
-                android:background="@color/common_action_bar_splitter"
+                android:background="@drawable/my_button"
                 android:onClick="onPicturesSelectClicked"
                 android:text="Click to Choose Folder"
                 android:textSize="20sp" />
@@ -97,6 +98,7 @@
                 android:textStyle="italic" />
 
             <Button
+                android:id="@+id/clear_pics_button"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -104,7 +106,7 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginStart="20sp"
                 android:layout_weight="1"
-                android:background="@color/common_action_bar_splitter"
+                android:background="@drawable/my_button"
                 android:onClick="onClearPicturesClicked"
                 android:text="Clear Selection"
                 android:textSize="20sp" />
@@ -132,12 +134,13 @@
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/select_text_button"
                 android:layout_width="20dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
-                android:background="@color/common_action_bar_splitter"
+                android:background="@drawable/my_button"
                 android:onClick="onTextSelectClicked"
                 android:text="Click to Choose Folder"
                 android:textSize="20sp" />
@@ -172,6 +175,7 @@
                 android:textStyle="italic" />
 
             <Button
+                android:id="@+id/clear_text_button"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -179,7 +183,7 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginStart="20sp"
                 android:layout_weight="1"
-                android:background="@color/common_action_bar_splitter"
+                android:background="@drawable/my_button"
                 android:onClick="onClearTextClicked"
                 android:text="Clear Selection"
                 android:textSize="20sp" />
@@ -200,6 +204,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
+                android:layout_weight="1"
                 android:text="Set Slideshow Delay:"
                 android:textColor="@android:color/background_light"
                 android:textSize="25sp" />
@@ -208,14 +213,29 @@
                 android:id="@+id/slideshow_delay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginStart="30dp"
-                android:hint="type the number of seconds here"
+                android:layout_weight="1"
+                android:hint="seconds"
                 android:inputType="number"
                 android:textColor="#7dfd60"
                 android:textColorHint="#fffafa"
                 android:textSize="25sp"
                 android:textStyle="italic" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="Start on boot:"
+                android:textColor="#ffffff"
+                android:textSize="25sp" />
+
+            <ToggleButton
+                android:id="@+id/boot_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
 
 
         </LinearLayout>

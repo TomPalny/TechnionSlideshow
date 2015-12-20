@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 
     <application
@@ -15,6 +16,14 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <receiver android:enabled="true" android:exported="true"
+            android:name=".StartMyAppAtBootReceiver"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </receiver>
         <activity
             android:name=".Select_Folders"
             android:screenOrientation="landscape">
@@ -26,14 +35,15 @@
         </activity>
         <activity
             android:name=".FullscreenSlideshow"
-            android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|screenSize"
             android:label="@string/title_activity_fullscreen_slideshow"
+            android:screenOrientation="landscape"
             android:theme="@style/FullscreenTheme"></activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
     </application>
 
 </manifest>

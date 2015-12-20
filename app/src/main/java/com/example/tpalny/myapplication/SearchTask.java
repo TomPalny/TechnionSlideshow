@@ -1,6 +1,5 @@
 package com.example.tpalny.myapplication;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
@@ -19,7 +18,7 @@ import java.util.List;
 class SearchTask extends AsyncTask<Void, Void, Void> {
 
     private Exception mLastError = null;
-    private String mFolderId = Select_Folders.folderID;
+    private String mFolderId = Select_Folders.picturesFolderID;
     private Boolean mIsImage = false;
     private Boolean mIsText = false;
     private Drive mGOOSvc = Select_Folders.mGOOSvc;

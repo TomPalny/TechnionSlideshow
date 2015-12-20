@@ -21,9 +21,10 @@ import java.util.TimerTask;
 public class FullscreenSlideshow extends AppCompatActivity {
 
 
-    private ImageView mImageView;
+    private static final int MAX_NUM_OF_ATTEMPTS = 5;
+    private ImageView mImageView1;
+    private ImageView mImageView2;
     private int currentPic = 0;
-    //private Boolean firstPass = true;
     private Timer timer;
     private TimerTask timerTask;
     private final Handler handler = new Handler();
@@ -33,8 +34,9 @@ public class FullscreenSlideshow extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen_slideshow);
-
-        mImageView = (ImageView) findViewById(R.id.my_image);
+        Select_Folders.userCancelledSlideshow = false;
+        mImageView1 = (ImageView) findViewById(R.id.my_image1);
+        mImageView2 = (ImageView) findViewById(R.id.my_image2);
 
     }
 
@@ -78,32 +80,14 @@ public class FullscreenSlideshow extends AppCompatActivity {
             if (currentPic == Select_Folders.imagesList.size() || bm == null) {
                 new SearchTask(FullscreenSlideshow.this, true, false).execute();
             }
+            if (currentPic % 2 == 0) {
+                mImageView2.setImageResource(android.R.color.transparent);
+                mImageView1.setImageBitmap(bm);
 
-            /*FileOutputStream out = null;
-            try {
-                out = new FileOutputStream("R.drawable.my_image.xml");
-                bm.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-                // PNG is a lossless format, the compression factor (100) is ignored
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (out != null) {
-                        out.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }*/
-            mImageView.setImageBitmap(bm);
-            //Drawable d = new BitmapDrawable(getResources(),bm);
-            //Picasso.with(getApplicationContext()).load(R.drawable.my_image);
-            /*try {
-                Integer delay = Integer.parseInt(Select_Folders.slideShowDelay.getText().toString());
-                Thread.sleep(delay * 1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*/
+            } else {
+                mImageView1.setImageResource(android.R.color.transparent);
+                mImageView2.setImageBitmap(bm);
+            }
 
         }
     }
@@ -112,12 +96,26 @@ public class FullscreenSlideshow extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        int x = 0;
         while (Select_Folders.imagesList == null) {
+            x++;
+            if (x >= MAX_NUM_OF_ATTEMPTS) {
+                x = 0;
+                //new SearchTask(FullscreenSlideshow.this, true, false).execute();
+                cancelTimerAndReturn();
+            }
         }
-        //Integer delay = Integer.parseInt(Select_Folders.slideShowDelay.getText().toString());
+
         startTimer();
 
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Select_Folders.userCancelledSlideshow = true;
+        cancelTimerAndReturn();
     }
 
     public void startTimer() {
@@ -128,7 +126,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
         initializeTimerTask();
 
         Integer delay = Integer.parseInt(Select_Folders.slideShowDelay.getText().toString());
-        timer.schedule(timerTask, 0, delay * 1000); //
+        timer.schedule(timerTask, 0, delay * 1000);
     }
 
     public void initializeTimerTask() {
@@ -150,6 +148,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
     }
 
     public void onImageClicked(View view) {
+        Select_Folders.userCancelledSlideshow = true;
         cancelTimerAndReturn();
     }
 

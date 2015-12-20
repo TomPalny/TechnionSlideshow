@@ -4,13 +4,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.tpalny.myapplication.FullscreenSlideshow"
-    android:keepScreenOn="true">
+    android:keepScreenOn="true"
+    android:animateLayoutChanges="true">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/my_image"
-        android:onClick="onImageClicked"/>
+        android:id="@+id/my_image1"
+        android:onClick="onImageClicked"
+        />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/my_image2"
+        android:onClick="onImageClicked"
+        />
 
 
 
