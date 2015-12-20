@@ -4,6 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.ViewFlipper;
 
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
@@ -15,10 +18,13 @@ import java.io.InputStream;
  * Created by tpalny on 20/12/2015.
  */
 public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
-    private int currentPic = 0;
+    private static int currentPic = 0;
     private Context mContext;
+    private ImageView mImageView1 = FullscreenSlideshow.mImageView1;
+    private ImageView mImageView2 = FullscreenSlideshow.mImageView2;
+    private ViewFlipper mViewFlipper = FullscreenSlideshow.mViewFlipper;
 
-    DisplayImage(Context context){
+    DisplayImage(Context context) {
         mContext = context;
     }
 
@@ -61,12 +67,12 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
             new SearchTask(mContext, true, false).execute();
         }
         if (currentPic % 2 == 0) {
-            FullscreenSlideshow.mImageView2.setImageResource(android.R.color.transparent);
-            FullscreenSlideshow.mImageView1.setImageBitmap(bm);
+            mImageView1.setImageBitmap(bm);
+            mViewFlipper.setDisplayedChild(0);
 
         } else {
-            FullscreenSlideshow.mImageView1.setImageResource(android.R.color.transparent);
-            FullscreenSlideshow.mImageView2.setImageBitmap(bm);
+            mImageView2.setImageBitmap(bm);
+            mViewFlipper.setDisplayedChild(1);
         }
 
     }

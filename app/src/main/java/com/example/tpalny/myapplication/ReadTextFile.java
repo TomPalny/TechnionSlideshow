@@ -24,7 +24,7 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
             }
             resp =
                     Select_Folders.mGOOSvc.getRequestFactory()
-                            .buildGetRequest(new GenericUrl(Select_Folders.imagesList
+                            .buildGetRequest(new GenericUrl(Select_Folders.textList
                                     .get(0).getDownloadUrl())).execute();
             InputStream is = resp.getContent();
 
@@ -33,6 +33,7 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
             String line;
             while ((line = r.readLine()) != null) {
                 total.append(line);
+                total.append("      ");
             }
             return total.toString();
         } catch (IOException e) {
@@ -55,6 +56,7 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         FullscreenSlideshow.mText.setText(result);
-
+        FullscreenSlideshow.mText.setRndDuration(250);
+        FullscreenSlideshow.mText.startScroll();
     }
 }

@@ -7,28 +7,33 @@
     android:keepScreenOn="true"
     android:animateLayoutChanges="true">
 
-    <ImageView
+    <ViewFlipper
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/my_image1"
-        android:onClick="onImageClicked"
-        />
+        android:id="@+id/flipper">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/my_image2"
-        android:onClick="onImageClicked"
-        />
+        <ImageView
+            android:id="@+id/my_image1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:onClick="onImageClicked" />
 
-    <TextView
+        <ImageView
+            android:id="@+id/my_image2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:onClick="onImageClicked" />
+
+    </ViewFlipper>
+
+    <com.example.tpalny.myapplication.ScrollTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/my_image2"
+        android:layout_alignBottom="@id/flipper"
         android:layout_margin="@dimen/activity_vertical_margin"
-        android:singleLine="true"
         android:textSize="40sp"
         android:textColor="#ffc400"
-        android:id="@+id/my_text"/>
+        android:id="@+id/my_text">
+         </com.example.tpalny.myapplication.ScrollTextView>
 
 </RelativeLayout>

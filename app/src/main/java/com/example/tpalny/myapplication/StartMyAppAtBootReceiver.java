@@ -15,7 +15,7 @@ public class StartMyAppAtBootReceiver extends BroadcastReceiver {
         SharedPreferences settings = context.getSharedPreferences("com.example.tpalny.myapplication_preferences", Context.MODE_PRIVATE);
         String boot = settings.getString("start_on_boot", "false");
         Boolean start_on_boot = boot.equals("true");
-        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction()) && start_on_boot) {
             Intent i = new Intent(context, Select_Folders.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(i);

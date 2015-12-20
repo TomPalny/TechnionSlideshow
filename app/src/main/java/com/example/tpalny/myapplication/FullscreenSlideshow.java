@@ -1,11 +1,10 @@
 package com.example.tpalny.myapplication;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,10 +16,10 @@ public class FullscreenSlideshow extends AppCompatActivity {
     private static final int MAX_NUM_OF_ATTEMPTS = 10;
     protected static ImageView mImageView1;
     protected static ImageView mImageView2;
-    protected static TextView mText;
+    protected static ScrollTextView mText;
     private Timer timer;
     private TimerTask timerTask;
-    private final Handler handler = new Handler();
+    protected static ViewFlipper mViewFlipper;
 
 
     @Override
@@ -30,8 +29,10 @@ public class FullscreenSlideshow extends AppCompatActivity {
         Select_Folders.userCancelledSlideshow = false;
         mImageView1 = (ImageView) findViewById(R.id.my_image1);
         mImageView2 = (ImageView) findViewById(R.id.my_image2);
-        mText = (TextView) findViewById(R.id.my_text);
-
+        mText = (ScrollTextView) findViewById(R.id.my_text);
+        mViewFlipper = (ViewFlipper) findViewById(R.id.flipper);
+        mViewFlipper.setInAnimation(this, R.anim.slide_in_from_right);
+        mViewFlipper.setOutAnimation(this, R.anim.slide_out_to_left);
     }
 
 
@@ -44,21 +45,23 @@ public class FullscreenSlideshow extends AppCompatActivity {
             if (x >= MAX_NUM_OF_ATTEMPTS) {
                 x = 0;
                 //new SearchTask(FullscreenSlideshow.this, true, false).execute();
-                cancelTimerAndReturn();
+                cancelTimer(timer);
             }
         }
 
-        //startTimer();
-        new ReadTextFile().execute();
-
+        if (Select_Folders.isSlideShowWithText) {
+            new ReadTextFile().execute();
+        }
+        startTimer();
 
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         Select_Folders.userCancelledSlideshow = true;
-        cancelTimerAndReturn();
+        cancelTimer(timer);
+
+        super.onBackPressed();
     }
 
     public void startTimer() {
@@ -77,13 +80,9 @@ public class FullscreenSlideshow extends AppCompatActivity {
         timerTask = new TimerTask() {
             public void run() {
 
-                //use a handler to run a toast that shows the current timestamp
-                handler.post(new Runnable() {
-                    public void run() {
-                        new DisplayImage(FullscreenSlideshow.this).execute();
+                new DisplayImage(FullscreenSlideshow.this)
+                        .execute();
 
-                    }
-                });
             }
 
         };
@@ -92,15 +91,17 @@ public class FullscreenSlideshow extends AppCompatActivity {
 
     public void onImageClicked(View view) {
         Select_Folders.userCancelledSlideshow = true;
-        cancelTimerAndReturn();
-    }
-
-    private void cancelTimerAndReturn() {
-        //stop the timer, if it's not already null
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
+        cancelTimer(timer);
         finish();
     }
+
+    private void cancelTimer(Timer t) {
+        //stop the timer, if it's not already null
+        if (t != null) {
+            t.cancel();
+
+        }
+
+    }
+
 }

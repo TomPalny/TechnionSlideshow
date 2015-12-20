@@ -19,7 +19,8 @@ import java.util.List;
 class SearchTask extends AsyncTask<Void, Void, Void> {
 
     private Exception mLastError = null;
-    private String mFolderId = Select_Folders.picturesFolderID;
+    private String mPicturesFolderId = Select_Folders.picturesFolderID;
+    private String mTextFolderId = Select_Folders.textFolderID;
     private Boolean mIsImage = false;
     private Boolean mIsText = false;
     private Drive mGOOSvc = Select_Folders.mGOOSvc;
@@ -59,15 +60,15 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
 
 
         FileList result = null;
-        if (mFolderId != null) {
+        if (mPicturesFolderId != null) {
             if (mIsImage) {
-                result = mGOOSvc.files().list().setQ("'" + mFolderId +
+                result = mGOOSvc.files().list().setQ("'" + mPicturesFolderId +
                         "' in parents and mimeType contains 'image/' and trashed = false")
                         .execute();
             }
             if (mIsText) {
-                result = mGOOSvc.files().list().setQ("'" + mFolderId + "'" +
-                        " in parents and mimeType = 'text/plain' and trashed = false")
+                result = mGOOSvc.files().list().setQ("'" + mTextFolderId +
+                        "' in parents and mimeType = 'text/plain' and trashed = false")
                         .execute();
             }
 
@@ -85,6 +86,7 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
             }
             if (mIsText) {
                 Select_Folders.textList = new ArrayList<>();
+                Select_Folders.isSlideShowWithText = true;
                 for (File file : files) {
                     Select_Folders.textList.add(file);
                 }
@@ -97,9 +99,13 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        if (Select_Folders.imagesList.size() == 0) {
-            Toast.makeText(mContext, "No matching files in folder.", Toast.LENGTH_LONG).show();
+        if (mIsImage && Select_Folders.imagesList.size() == 0) {
+            Toast.makeText(mContext, "No Image files in folder", Toast.LENGTH_LONG).show();
 
+        }
+        if (mIsText && Select_Folders.textList.size() == 0) {
+            Toast.makeText(mContext, "No Text files in folder", Toast.LENGTH_LONG).show();
+            Select_Folders.isSlideShowWithText = false;
         }
     }
 

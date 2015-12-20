@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -85,6 +86,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     protected static String textFolderID = null;
     private String textFolderName = null;
     private ToggleButton toggle;
+    protected static boolean isSlideShowWithText = false;
 
 
     @Override
@@ -142,7 +144,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         if (isGooglePlayServicesAvailable()) {
             refreshResults();
         } else {
-            new AlertDialog.Builder(getApplicationContext())
+            new AlertDialog.Builder(Select_Folders.this)
                     .setMessage("Google Play Services required: " +
                             "after installing, close and relaunch this app.").show();
         }
@@ -173,7 +175,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                             new SearchTask(Select_Folders.this, true, false).execute();
 
                         } else {
-                            new AlertDialog.Builder(getApplicationContext())
+                            new AlertDialog.Builder(Select_Folders.this)
                                     .setMessage("No network connection available.").show();
                         }
                     }
@@ -185,6 +187,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             if (driveIdDecode.isEmpty()) {
                 return;
             }
+            isSlideShowWithText = true;
             final DriveId textDriveId = DriveId.decodeFromString(driveIdDecode);
             final DriveFolder textDriveFolder = textDriveId.asDriveFolder();
             textDriveFolder.getMetadata(mGoogleApiClient)
@@ -198,7 +201,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                                 new SearchTask(Select_Folders.this, false, true).execute();
 
                             } else {
-                                new AlertDialog.Builder(getApplicationContext())
+                                new AlertDialog.Builder(Select_Folders.this)
                                         .setMessage("No network connection available.").show();
                             }
                         }
@@ -217,7 +220,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             }
         };
         Timer timer = new Timer();
-        //timer.schedule(tt, 7000);
+        Toast.makeText(this, "Please wait a few seconds, the slideshow is starting...", Toast.LENGTH_LONG).show();
+        timer.schedule(tt, 7000);
     }
 
     private void refreshResults() {
@@ -366,7 +370,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                                 new SearchTask(Select_Folders.this, true, false).execute();
 
                             } else {
-                                new AlertDialog.Builder(getApplicationContext())
+                                new AlertDialog.Builder(Select_Folders.this)
                                         .setMessage("No network connection available.").show();
                             }
 
@@ -444,6 +448,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     }
 
     public void onClearTextClicked(View view) {
+        isSlideShowWithText = false;
         textSelectionText.setText("None Selected");
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(TEXT_FOLDER_NAME_TAG, "").apply();
@@ -452,9 +457,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     public void onPlaySlideshowClicked(View view) {
         String delay = slideShowDelay.getText().toString();
-        if (delay.isEmpty() || delay.equals("0")) {
+        if (delay.isEmpty() || Integer.parseInt(delay)<5) {
             new AlertDialog.Builder(this)
-                    .setMessage("Please enter a number greater than 0.").show();
+                    .setMessage("Delay should be at least 5 seconds").show();
             return;
         }
         SharedPreferences.Editor editor = settings.edit();
