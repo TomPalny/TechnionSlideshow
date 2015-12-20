@@ -74,7 +74,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private final String TEXT_FOLDER_TAG = "text_folder";
     private final String DELAY_TAG = "delay";
 
-    //private static boolean mConnected;
     private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
 
     private static String picturesFolderName = null;
@@ -87,6 +86,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private String textFolderName = null;
     private ToggleButton toggle;
     protected static boolean isSlideShowWithText = false;
+    private boolean userPressedPlay = false;
 
 
     @Override
@@ -150,7 +150,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         }
 
         String chosenFolder = settings.getString(PICTURES_FOLDER_TAG, "");
-        if (!chosenFolder.isEmpty() && !userCancelledSlideshow) {
+        if (!chosenFolder.isEmpty() && userPressedPlay && !userCancelledSlideshow) {
             populateFieldsWithExistingData();
         }
     }
@@ -463,6 +463,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             return;
         }
         SharedPreferences.Editor editor = settings.edit();
+        userPressedPlay = true;
         editor.putString(DELAY_TAG, delay).apply();
         Intent intent = new Intent(this, FullscreenSlideshow.class);
         startActivity(intent);
