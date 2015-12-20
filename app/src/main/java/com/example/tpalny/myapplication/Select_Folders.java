@@ -1,6 +1,7 @@
 package com.example.tpalny.myapplication;
 
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -12,7 +13,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -66,8 +66,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_AUTHORIZATION = 1003;
     private static final String DIALOG_ERROR = "dialog_error";
-    private boolean textWasSelected = false;
-    private boolean picturesWereSelected = false;
     protected static Boolean userCancelledSlideshow = false;
     private TextView pictureSelectionText;
     private TextView textSelectionText;
@@ -171,7 +169,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                         picturesFolderID = picsDriveId.getResourceId();
                         slideShowButton.setEnabled(true);
                         slideShowButton.setAlpha(1);
-                        picturesWereSelected = true;
                         if (isDeviceOnline()) {
                             new SearchTask(Select_Folders.this, true, false).execute();
 
@@ -197,7 +194,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                             textFolderName = settings.getString(TEXT_FOLDER_NAME_TAG, "");
                             textSelectionText.setText(textFolderName);
                             textFolderID = textDriveId.getResourceId();
-                            textWasSelected = true;
                             if (isDeviceOnline()) {
                                 new SearchTask(Select_Folders.this, false, true).execute();
 
@@ -221,7 +217,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             }
         };
         Timer timer = new Timer();
-        timer.schedule(tt, 5000);
+        //timer.schedule(tt, 7000);
     }
 
     private void refreshResults() {
@@ -247,7 +243,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         final int connectionStatusCode =
                 GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (GooglePlayServicesUtil.isUserRecoverableError(connectionStatusCode)) {
-            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
+            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode, Select_Folders.this);
             return false;
         } else if (connectionStatusCode != ConnectionResult.SUCCESS) {
             return false;
@@ -256,10 +252,10 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     }
 
     void showGooglePlayServicesAvailabilityErrorDialog(
-            final int connectionStatusCode) {
+            final int connectionStatusCode, Activity activity) {
         Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
                 connectionStatusCode,
-                Select_Folders.this,
+                activity,
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
@@ -366,7 +362,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                             pictureSelectionText.setText(picturesFolderName);
                             slideShowButton.setEnabled(true);
                             slideShowButton.setAlpha(1);
-                            picturesWereSelected = true;
                             if (isDeviceOnline()) {
                                 new SearchTask(Select_Folders.this, true, false).execute();
 
@@ -381,7 +376,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                             editor.putString(TEXT_FOLDER_TAG, textFolderID).apply();
                             editor.putString(TEXT_FOLDER_NAME_TAG, textFolderName).apply();
                             textSelectionText.setText(textFolderName);
-                            textWasSelected = true;
                             if (isDeviceOnline()) {
                                 new SearchTask(Select_Folders.this, false, true).execute();
 
@@ -441,7 +435,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
 
     public void onClearPicturesClicked(View view) {
-        picturesWereSelected = false;
         slideShowButton.setEnabled(false);
         slideShowButton.setAlpha(.5f);
         pictureSelectionText.setText("None Selected");
@@ -451,7 +444,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     }
 
     public void onClearTextClicked(View view) {
-        textWasSelected = false;
         textSelectionText.setText("None Selected");
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(TEXT_FOLDER_NAME_TAG, "").apply();

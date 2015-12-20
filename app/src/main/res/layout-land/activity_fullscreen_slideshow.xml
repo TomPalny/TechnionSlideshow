@@ -3,34 +3,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.tpalny.myapplication.FullscreenSlideshow"
+    android:animateLayoutChanges="true"
     android:keepScreenOn="true"
-    android:animateLayoutChanges="true">
+    tools:context="com.example.tpalny.myapplication.FullscreenSlideshow">
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:id="@+id/my_image1"
-        android:onClick="onImageClicked"
-        />
-
-    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/my_image2"
-        android:onClick="onImageClicked"
-        />
+        android:onClick="onImageClicked" />
 
+    <ImageView
+        android:id="@+id/my_image2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:onClick="onImageClicked" />
 
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/my_image"
+        android:layout_alignBottom="@id/my_image2"
         android:layout_margin="@dimen/activity_vertical_margin"
         android:singleLine="true"
-        android:textSize="40dp"/>
-        
+        android:textColor="#ffc400"
+        android:textSize="40sp"
+        android:id="@+id/my_text"/>
+
 
 </RelativeLayout>
 

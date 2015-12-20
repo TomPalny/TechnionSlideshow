@@ -1,5 +1,6 @@
 package com.example.tpalny.myapplication;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
@@ -51,6 +52,7 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
     /**
      * List of Strings describing files, or an empty list if no files
      * found.
+     *
      * @throws IOException
      */
     private void getDataFromApi() throws IOException {
@@ -65,10 +67,7 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
             }
             if (mIsText) {
                 result = mGOOSvc.files().list().setQ("'" + mFolderId + "'" +
-                        " in parents and (mimeType = 'text/plain'" +
-                        " or mimeType = 'application/msword'" +
-                        " or mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')" +
-                        " and trashed = false")
+                        " in parents and mimeType = 'text/plain' and trashed = false")
                         .execute();
             }
 
@@ -98,31 +97,23 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        if (Select_Folders.imagesList.size()==0){
-            Toast.makeText(mContext, "No matching files in folder.", Toast.LENGTH_LONG ).show();
+        if (Select_Folders.imagesList.size() == 0) {
+            Toast.makeText(mContext, "No matching files in folder.", Toast.LENGTH_LONG).show();
 
         }
     }
 
     @Override
     protected void onCancelled() {
-        /*if (mLastError != null) {
-            if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                showGooglePlayServicesAvailabilityErrorDialog(
-                        ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                .getConnectionStatusCode());
-            } else if (mLastError instanceof UserRecoverableAuthIOException) {
-                startActivityForResult(
-                        ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                        Select_Folders.REQUEST_AUTHORIZATION);
-            } else {
-                new AlertDialog.Builder(Select_Folders.this)
-                        .setMessage("The following error occurred:\n"
-                                + mLastError.getMessage()).show();
-            }
+        if (mLastError != null) {
+
+            new AlertDialog.Builder(mContext)
+                    .setMessage("The following error occurred:\n"
+                            + mLastError.getMessage()).show();
+
         } else {
-            new AlertDialog.Builder(Select_Folders.this)
+            new AlertDialog.Builder(mContext)
                     .setMessage("Request cancelled.").show();
-        }*/
+        }
     }
 }
