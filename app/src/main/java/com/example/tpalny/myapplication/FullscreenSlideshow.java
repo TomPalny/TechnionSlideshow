@@ -68,7 +68,8 @@ public class FullscreenSlideshow extends AppCompatActivity {
                 }
             };
             textUpdateTimer = new Timer();
-            textUpdateTimer.schedule(textUpdateTask, 10*1000, 10*1000);
+            Integer rate = Integer.parseInt(Select_Folders.textFileRefreshRate.getText().toString());
+            textUpdateTimer.schedule(textUpdateTask, rate*1000, rate*1000);
         }
         startTimer();
 

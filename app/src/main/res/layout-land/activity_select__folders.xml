@@ -204,27 +204,39 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
-                android:layout_weight="1"
-                android:text="Set Slideshow Delay:"
+                android:text="Picture Duration on screen (second):"
                 android:textColor="@android:color/background_light"
                 android:textSize="25sp" />
 
             <EditText
                 android:id="@+id/slideshow_delay"
-                android:layout_width="wrap_content"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="5"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
                 android:inputType="number"
+                android:text="5"
                 android:textColor="#7dfd60"
                 android:textColorHint="#fffafa"
                 android:textSize="25sp"
                 android:textStyle="italic" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingEnd="10sp"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
+            android:paddingStart="10sp">
+
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.5"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
                 android:text="Start on boot:"
                 android:textColor="#ffffff"
                 android:textSize="25sp" />
@@ -233,9 +245,82 @@
                 android:id="@+id/boot_start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.5"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
                 android:textColor="#ffffff"
                 android:textSize="20sp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingEnd="10sp"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
+            android:paddingStart="10sp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+
+                android:text="Text scroll speed (1-10):"
+                android:textColor="@android:color/background_light"
+                android:textSize="25sp" />
+
+            <EditText
+                android:id="@+id/text_scroll_speed"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+                android:inputType="number"
+                android:text="5"
+                android:textColor="#7dfd60"
+                android:textColorHint="#fffafa"
+                android:textSize="25sp"
+                android:textStyle="italic" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingEnd="10sp"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
+            android:paddingStart="10sp">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+                android:text="Text files refresh rate (seconds):"
+                android:textColor="#ffffff"
+                android:textSize="25sp" />
+
+            <EditText
+                android:id="@+id/text_file_refresh_rate"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+
+                android:inputType="number"
+                android:text="60"
+                android:textColor="#7dfd60"
+                android:textColorHint="#fffafa"
+                android:textSize="25sp"
+                android:textStyle="italic" />
 
 
         </LinearLayout>

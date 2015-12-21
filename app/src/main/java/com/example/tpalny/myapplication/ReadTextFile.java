@@ -62,7 +62,9 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         FullscreenSlideshow.mText.setText(result);
-        FullscreenSlideshow.mText.setRndDuration(275);
+        Integer[] speeds = {500, 450, 400, 350, 300, 250, 200, 150, 100, 75};
+        Integer selectedSpeed = Integer.parseInt(Select_Folders.textScrollSpeed.getText().toString()) - 1;
+        FullscreenSlideshow.mText.setRndDuration(speeds[selectedSpeed]);
         FullscreenSlideshow.mText.startScroll();
     }
 }

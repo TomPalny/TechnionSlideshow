@@ -57,6 +57,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private static final String TEXT_DRIVEID = "text_driveID";
     private static final String DIALOG_ERROR = "dialog_error";
     protected static final String USER_CANCELLED_SLIDESHOW = "user_cancelled_slideshow";
+    protected static final String SCROLLING_SPEED = "scrolling_speed";
+    protected static final String REFRESH_RATE = "refresh_rate";
     private final String PICTURES_FOLDER_TAG = "pictures_folder";
     private final String TEXT_FOLDER_TAG = "text_folder";
     private final String DELAY_TAG = "delay";
@@ -82,6 +84,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     public static List<File> imagesList;
     public static List<File> textList;
     protected static EditText slideShowDelay;
+    protected static EditText textScrollSpeed;
+    protected static EditText textFileRefreshRate;
     private SharedPreferences settings;
     protected static String textFolderID = null;
     private String textFolderName = null;
@@ -89,7 +93,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     protected static boolean isSlideShowWithText = false;
 
     private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
-
 
 
     @Override
@@ -102,6 +105,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         pictureSelectionText = (TextView) findViewById(R.id.Selected_Image_Folder);
         textSelectionText = (TextView) findViewById(R.id.Selected_Text_Folder);
         slideShowDelay = (EditText) findViewById(R.id.slideshow_delay);
+        textScrollSpeed = (EditText) findViewById(R.id.text_scroll_speed);
+        textFileRefreshRate = (EditText) findViewById(R.id.text_file_refresh_rate);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(com.google.android.gms.drive.Drive.API)
@@ -151,9 +156,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                     .setMessage("Google Play Services required: " +
                             "after installing, close and relaunch this app.").show();
         }
-        Boolean userCancelledSlideshow = settings.getBoolean(USER_CANCELLED_SLIDESHOW, true);
+
         String chosenFolder = settings.getString(PICTURES_FOLDER_TAG, "");
-        if (!chosenFolder.isEmpty() && !userCancelledSlideshow) {
+        if (!chosenFolder.isEmpty() ) {
             populateFieldsWithExistingData();
         }
     }
@@ -212,19 +217,27 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
 
         }
-        String delay = settings.getString(DELAY_TAG, "");
+        String delay = settings.getString(DELAY_TAG, "5");
         slideShowDelay.setText(delay);
+        String scrollingSpeed = settings.getString(SCROLLING_SPEED, "5");
+        textScrollSpeed.setText(scrollingSpeed);
+        String refreshRate = settings.getString(REFRESH_RATE, "60");
+        textFileRefreshRate.setText(refreshRate);
         toggle.setChecked(settings.getString(START_ON_BOOT, "").equals("true"));
-        final Intent intent = new Intent(this, FullscreenSlideshow.class);
-        TimerTask tt = new TimerTask() {
-            @Override
-            public void run() {
-                startActivity(intent);
-            }
-        };
-        Timer timer = new Timer();
-        Toast.makeText(this, "Please wait a few seconds, the slideshow is starting...", Toast.LENGTH_LONG).show();
-        timer.schedule(tt, 7000);
+
+        Boolean userCancelledSlideshow = settings.getBoolean(USER_CANCELLED_SLIDESHOW, true);
+        if (!userCancelledSlideshow) {
+            final Intent intent = new Intent(this, FullscreenSlideshow.class);
+            TimerTask tt = new TimerTask() {
+                @Override
+                public void run() {
+                    startActivity(intent);
+                }
+            };
+            Timer timer = new Timer();
+            Toast.makeText(this, "Please wait a few seconds, the slideshow is starting...", Toast.LENGTH_LONG).show();
+            timer.schedule(tt, 7000);
+        }
     }
 
     private void refreshResults() {
@@ -288,8 +301,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         //mGoogleApiClient.disconnect();
         super.onStop();
     }
-
-
 
 
     @Override
@@ -457,13 +468,21 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     public void onPlaySlideshowClicked(View view) {
         String delay = slideShowDelay.getText().toString();
-        if (delay.isEmpty() || Integer.parseInt(delay)<5) {
-            new AlertDialog.Builder(this)
-                    .setMessage("Delay should be at least 5 seconds").show();
+        if (delay.isEmpty() || Integer.parseInt(delay) < 5) {
+            Toast.makeText(this, "Delay should be at least 5 seconds", Toast.LENGTH_SHORT).show();
             return;
         }
+        String scrollingSpeed = textScrollSpeed.getText().toString();
+        Integer scrollingSpeedInt = Integer.parseInt(scrollingSpeed);
+        if (scrollingSpeedInt > 10 || scrollingSpeedInt < 1) {
+            Toast.makeText(this, "Scrolling Speed between 1 and 10...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String refreshRate = textFileRefreshRate.getText().toString();
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(DELAY_TAG, delay).apply();
+        editor.putString(SCROLLING_SPEED, scrollingSpeed).apply();
+        editor.putString(REFRESH_RATE, refreshRate).apply();
         editor.putBoolean(USER_CANCELLED_SLIDESHOW, false).apply();
         Intent intent = new Intent(this, FullscreenSlideshow.class);
         startActivity(intent);
