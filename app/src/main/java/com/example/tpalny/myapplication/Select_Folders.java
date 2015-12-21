@@ -468,14 +468,17 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     public void onPlaySlideshowClicked(View view) {
         String delay = slideShowDelay.getText().toString();
+        slideShowButton.setAlpha(.7f);
         if (delay.isEmpty() || Integer.parseInt(delay) < 5) {
             Toast.makeText(this, "Delay should be at least 5 seconds", Toast.LENGTH_SHORT).show();
+            slideShowButton.setAlpha(1);
             return;
         }
         String scrollingSpeed = textScrollSpeed.getText().toString();
         Integer scrollingSpeedInt = Integer.parseInt(scrollingSpeed);
         if (scrollingSpeedInt > 10 || scrollingSpeedInt < 1) {
             Toast.makeText(this, "Scrolling Speed between 1 and 10...", Toast.LENGTH_SHORT).show();
+            slideShowButton.setAlpha(1);
             return;
         }
         String refreshRate = textFileRefreshRate.getText().toString();
