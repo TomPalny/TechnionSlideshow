@@ -75,7 +75,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private IntentSender intentSender;
     private Button slideShowButton;
     private boolean mResolvingError = false;
-    private static Boolean userCancelledSlideshow = true;
     private TextView pictureSelectionText;
     private TextView textSelectionText;
     private static String picturesFolderName = null;
@@ -152,8 +151,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                     .setMessage("Google Play Services required: " +
                             "after installing, close and relaunch this app.").show();
         }
-        Boolean userCancelledSlideshowMemory = settings.getBoolean(USER_CANCELLED_SLIDESHOW, true);
-        userCancelledSlideshow = userCancelledSlideshowMemory;
+        Boolean userCancelledSlideshow = settings.getBoolean(USER_CANCELLED_SLIDESHOW, true);
         String chosenFolder = settings.getString(PICTURES_FOLDER_TAG, "");
         if (!chosenFolder.isEmpty() && !userCancelledSlideshow) {
             populateFieldsWithExistingData();
@@ -466,7 +464,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         }
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(DELAY_TAG, delay).apply();
-        editor.putBoolean(USER_CANCELLED_SLIDESHOW, false);
+        editor.putBoolean(USER_CANCELLED_SLIDESHOW, false).apply();
         Intent intent = new Intent(this, FullscreenSlideshow.class);
         startActivity(intent);
     }

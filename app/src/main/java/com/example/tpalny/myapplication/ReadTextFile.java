@@ -53,9 +53,9 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
                 }
 
             }
-            return superTotal.toString();
         }
-        return null;
+        return superTotal.toString();
+
 
     }
 
