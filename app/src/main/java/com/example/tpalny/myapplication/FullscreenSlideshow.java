@@ -1,9 +1,13 @@
 package com.example.tpalny.myapplication;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import java.util.Timer;
@@ -17,16 +21,18 @@ public class FullscreenSlideshow extends AppCompatActivity {
     protected static ImageView mImageView1;
     protected static ImageView mImageView2;
     protected static ScrollTextView mText;
-    private Timer timer;
+    private Timer picturesChangeTimer;
     private TimerTask timerTask;
     protected static ViewFlipper mViewFlipper;
+    private Timer textUpdateTimer;
+    private SharedPreferences settings;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen_slideshow);
-        Select_Folders.userCancelledSlideshow = false;
+        settings = getSharedPreferences("com.example.tpalny.myapplication_preferences", Context.MODE_PRIVATE);
         mImageView1 = (ImageView) findViewById(R.id.my_image1);
         mImageView2 = (ImageView) findViewById(R.id.my_image2);
         mText = (ScrollTextView) findViewById(R.id.my_text);
@@ -44,13 +50,25 @@ public class FullscreenSlideshow extends AppCompatActivity {
             x++;
             if (x >= MAX_NUM_OF_ATTEMPTS) {
                 x = 0;
-                //new SearchTask(FullscreenSlideshow.this, true, false).execute();
-                cancelTimer(timer);
+
+                cancelTimer(picturesChangeTimer);
+                cancelTimer(textUpdateTimer);
+                Toast.makeText(this,"Network is slow, images didn't load", Toast.LENGTH_LONG).show();
+                finish();
             }
         }
 
         if (Select_Folders.isSlideShowWithText) {
             new ReadTextFile().execute();
+            TimerTask textUpdateTask = new TimerTask() {
+                @Override
+                public void run() {
+                    new SearchTask(FullscreenSlideshow.this, false, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                    new ReadTextFile().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                }
+            };
+            textUpdateTimer = new Timer();
+            textUpdateTimer.schedule(textUpdateTask, 10*1000, 10*1000);
         }
         startTimer();
 
@@ -58,21 +76,23 @@ public class FullscreenSlideshow extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Select_Folders.userCancelledSlideshow = true;
-        cancelTimer(timer);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
+        cancelTimer(picturesChangeTimer);
+        cancelTimer(textUpdateTimer);
 
         super.onBackPressed();
     }
 
     public void startTimer() {
         //set a new Timer
-        timer = new Timer();
+        picturesChangeTimer = new Timer();
 
         //initialize the TimerTask's job
         initializeTimerTask();
 
         Integer delay = Integer.parseInt(Select_Folders.slideShowDelay.getText().toString());
-        timer.schedule(timerTask, 0, delay * 1000);
+        picturesChangeTimer.schedule(timerTask, 0, delay * 1000);
     }
 
     public void initializeTimerTask() {
@@ -90,8 +110,10 @@ public class FullscreenSlideshow extends AppCompatActivity {
     }
 
     public void onImageClicked(View view) {
-        Select_Folders.userCancelledSlideshow = true;
-        cancelTimer(timer);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
+        cancelTimer(picturesChangeTimer);
+        cancelTimer(textUpdateTimer);
         finish();
     }
 

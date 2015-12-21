@@ -50,32 +50,34 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         GoogleApiClient.OnConnectionFailedListener {
 
     private static final int MAXIMUM_ATTEMPTS_TO_CONNECT = 4;
-    private static final int REQUEST_CODE_RESOLUTION = 1004;
     private static final String PICS_FOLDER_NAME_TAG = "pics_folder_name";
     private static final String TEXT_FOLDER_NAME_TAG = "text_folder_name";
     protected static final String START_ON_BOOT = "start_on_boot";
     private static final String PICS_DRIVEID = "pics_driveID";
     private static final String TEXT_DRIVEID = "text_driveID";
+    private static final String DIALOG_ERROR = "dialog_error";
+    protected static final String USER_CANCELLED_SLIDESHOW = "user_cancelled_slideshow";
+    private final String PICTURES_FOLDER_TAG = "pictures_folder";
+    private final String TEXT_FOLDER_TAG = "text_folder";
+    private final String DELAY_TAG = "delay";
+    private static final int REQUEST_CODE_IMAGE_OPENER = 1;
+    private static final int REQUEST_CODE_TEXT_OPENER = 2;
+    static final int REQUEST_ACCOUNT_PICKER = 1000;
+    private static final int REQUEST_RESOLVE_ERROR = 1001;
+    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+    static final int REQUEST_AUTHORIZATION = 1003;
+    private static final int REQUEST_CODE_RESOLUTION = 1004;
+    private static final String TAG = "PickFolderWithOpener";
+
     private GoogleApiClient mGoogleApiClient;
     protected static GoogleAccountCredential mCredential;
     protected static Drive mGOOSvc;
     private IntentSender intentSender;
     private Button slideShowButton;
     private boolean mResolvingError = false;
-    static final int REQUEST_ACCOUNT_PICKER = 1000;
-    private static final int REQUEST_RESOLVE_ERROR = 1001;
-    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    static final int REQUEST_AUTHORIZATION = 1003;
-    private static final String DIALOG_ERROR = "dialog_error";
-    protected static Boolean userCancelledSlideshow = false;
+    private static Boolean userCancelledSlideshow = true;
     private TextView pictureSelectionText;
     private TextView textSelectionText;
-    private final String PICTURES_FOLDER_TAG = "pictures_folder";
-    private final String TEXT_FOLDER_TAG = "text_folder";
-    private final String DELAY_TAG = "delay";
-
-    private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
-
     private static String picturesFolderName = null;
     protected static String picturesFolderID = null;
     public static List<File> imagesList;
@@ -86,7 +88,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private String textFolderName = null;
     private ToggleButton toggle;
     protected static boolean isSlideShowWithText = false;
-    private boolean userPressedPlay = false;
+
+    private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
+
 
 
     @Override
@@ -148,9 +152,10 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                     .setMessage("Google Play Services required: " +
                             "after installing, close and relaunch this app.").show();
         }
-
+        Boolean userCancelledSlideshowMemory = settings.getBoolean(USER_CANCELLED_SLIDESHOW, true);
+        userCancelledSlideshow = userCancelledSlideshowMemory;
         String chosenFolder = settings.getString(PICTURES_FOLDER_TAG, "");
-        if (!chosenFolder.isEmpty() && userPressedPlay && !userCancelledSlideshow) {
+        if (!chosenFolder.isEmpty() && !userCancelledSlideshow) {
             populateFieldsWithExistingData();
         }
     }
@@ -286,10 +291,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         super.onStop();
     }
 
-    private static final String TAG = "PickFolderWithOpener";
 
-    private static final int REQUEST_CODE_IMAGE_OPENER = 1;
-    private static final int REQUEST_CODE_TEXT_OPENER = 2;
 
 
     @Override
@@ -463,8 +465,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             return;
         }
         SharedPreferences.Editor editor = settings.edit();
-        userPressedPlay = true;
         editor.putString(DELAY_TAG, delay).apply();
+        editor.putBoolean(USER_CANCELLED_SLIDESHOW, false);
         Intent intent = new Intent(this, FullscreenSlideshow.class);
         startActivity(intent);
     }

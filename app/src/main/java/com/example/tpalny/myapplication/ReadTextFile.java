@@ -17,37 +17,43 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... params) {
+        if (Select_Folders.textList.isEmpty()) {
+            return null;
+        }
         HttpResponse resp = null;
-        try {
-            if (Select_Folders.textList.isEmpty()) {
-                return null;
-            }
-            resp =
-                    Select_Folders.mGOOSvc.getRequestFactory()
-                            .buildGetRequest(new GenericUrl(Select_Folders.textList
-                                    .get(0).getDownloadUrl())).execute();
-            InputStream is = resp.getContent();
+        StringBuilder superTotal = new StringBuilder();
+        int currentTextFileNum = 0;
+        while (currentTextFileNum < Select_Folders.textList.size()) {
 
-            BufferedReader r = new BufferedReader(new InputStreamReader(is));
-            StringBuilder total = new StringBuilder(is.available());
-            String line;
-            while ((line = r.readLine()) != null) {
-                total.append(line);
-                total.append("      ");
-            }
-            return total.toString();
-        } catch (IOException e) {
-            // An error occurred.
-            e.printStackTrace();
-        } finally {
-            if (resp != null) {
-                try {
-                    resp.disconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
+            try {
+                resp =
+                        Select_Folders.mGOOSvc.getRequestFactory()
+                                .buildGetRequest(new GenericUrl(Select_Folders.textList
+                                        .get(currentTextFileNum++).getDownloadUrl())).execute();
+                InputStream is = resp.getContent();
+
+                BufferedReader r = new BufferedReader(new InputStreamReader(is));
+                StringBuilder total = new StringBuilder(is.available());
+                String line;
+                while ((line = r.readLine()) != null) {
+                    total.append(line);
+                    total.append("      ");
                 }
-            }
+                superTotal.append(total);
+            } catch (IOException e) {
+                // An error occurred.
+                e.printStackTrace();
+            } finally {
+                if (resp != null) {
+                    try {
+                        resp.disconnect();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
+            }
+            return superTotal.toString();
         }
         return null;
 
@@ -56,7 +62,7 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         FullscreenSlideshow.mText.setText(result);
-        FullscreenSlideshow.mText.setRndDuration(250);
+        FullscreenSlideshow.mText.setRndDuration(275);
         FullscreenSlideshow.mText.startScroll();
     }
 }

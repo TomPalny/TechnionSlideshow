@@ -105,7 +105,7 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
         }
         if (mIsText && Select_Folders.textList.size() == 0) {
             Toast.makeText(mContext, "No Text files in folder", Toast.LENGTH_LONG).show();
-            Select_Folders.isSlideShowWithText = false;
+
         }
     }
 
