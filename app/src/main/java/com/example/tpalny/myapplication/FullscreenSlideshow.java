@@ -26,6 +26,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
     protected static ViewFlipper mViewFlipper;
     private Timer textUpdateTimer;
     private SharedPreferences settings;
+    protected static Boolean noTextFoundMessageFirstTimeAppearance;
 
 
     @Override
@@ -39,6 +40,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
         mViewFlipper = (ViewFlipper) findViewById(R.id.flipper);
         mViewFlipper.setInAnimation(this, R.anim.slide_in_from_right);
         mViewFlipper.setOutAnimation(this, R.anim.slide_out_to_left);
+        noTextFoundMessageFirstTimeAppearance = true;
     }
 
 
@@ -53,7 +55,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
 
                 cancelTimer(picturesChangeTimer);
                 cancelTimer(textUpdateTimer);
-                Toast.makeText(this,"Network is slow, images didn't load", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Network is slow, images didn't load", Toast.LENGTH_LONG).show();
                 finish();
             }
         }
@@ -69,7 +71,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
             };
             textUpdateTimer = new Timer();
             Integer rate = Integer.parseInt(Select_Folders.textFileRefreshRate.getText().toString());
-            textUpdateTimer.schedule(textUpdateTask, rate*1000, rate*1000);
+            textUpdateTimer.schedule(textUpdateTask, rate * 1000, rate * 1000);
         }
         startTimer();
 
