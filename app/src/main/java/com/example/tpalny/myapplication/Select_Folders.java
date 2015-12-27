@@ -1,18 +1,15 @@
 package com.example.tpalny.myapplication;
 
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -25,16 +22,13 @@ import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResource;
 import com.google.android.gms.drive.OpenFileActivityBuilder;
-import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
@@ -55,28 +49,25 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     protected static final String START_ON_BOOT = "start_on_boot";
     private static final String PICS_DRIVEID = "pics_driveID";
     private static final String TEXT_DRIVEID = "text_driveID";
-    private static final String DIALOG_ERROR = "dialog_error";
     protected static final String USER_CANCELLED_SLIDESHOW = "user_cancelled_slideshow";
     protected static final String SCROLLING_SPEED = "scrolling_speed";
     protected static final String REFRESH_RATE = "refresh_rate";
+    private static final String PREF_ACCOUNT_NAME = "accountName";
     private final String PICTURES_FOLDER_TAG = "pictures_folder";
     private final String TEXT_FOLDER_TAG = "text_folder";
     private final String DELAY_TAG = "delay";
     private static final int REQUEST_CODE_IMAGE_OPENER = 1;
     private static final int REQUEST_CODE_TEXT_OPENER = 2;
     static final int REQUEST_ACCOUNT_PICKER = 1000;
-    private static final int REQUEST_RESOLVE_ERROR = 1001;
+    static final int REQUEST_AUTHORIZATION = 1001;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    static final int REQUEST_AUTHORIZATION = 1003;
-    private static final int REQUEST_CODE_RESOLUTION = 1004;
+    private static final int REQUEST_CODE_RESOLUTION = 1003;
     private static final String TAG = "PickFolderWithOpener";
 
     private GoogleApiClient mGoogleApiClient;
     protected static GoogleAccountCredential mCredential;
-    protected static Drive mGOOSvc;
     private IntentSender intentSender;
     private Button slideShowButton;
-    private boolean mResolvingError = false;
     private TextView pictureSelectionText;
     private TextView textSelectionText;
     private static String picturesFolderName = null;
@@ -86,7 +77,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     protected static EditText slideShowDelay;
     protected static EditText textScrollSpeed;
     protected static EditText textFileRefreshRate;
-    private SharedPreferences settings;
+    private static SharedPreferences settings;
     protected static String textFolderID = null;
     private String textFolderName = null;
     private ToggleButton toggle;
@@ -117,7 +108,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         mGoogleApiClient.connect();
 
         settings = getSharedPreferences("com.example.tpalny.myapplication_preferences", Context.MODE_PRIVATE);
-        connectToGoogleService();
+        connectToGoogleService(this);
 
         toggle = (ToggleButton) findViewById(R.id.boot_start);
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -135,13 +126,12 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     }
 
-    private void connectToGoogleService() {
+    protected static void connectToGoogleService(Context context) {
         mCredential = GoogleAccountCredential.usingOAuth2(
-                getApplicationContext(), Arrays.asList(SCOPES))
+                context, Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff())
-                .setSelectedAccountName(settings.getString("accountName", null));
-        mGOOSvc = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), mCredential)
-                .setApplicationName("Technion Slideshow App").build();
+                .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+
     }
 
 
@@ -149,7 +139,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     protected void onResume() {
         super.onResume();
 
-        if (isGooglePlayServicesAvailable()) {
+        if (isGoogleAvailable()) {
             refreshResults();
         } else {
             new AlertDialog.Builder(Select_Folders.this)
@@ -158,7 +148,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         }
 
         String chosenFolder = settings.getString(PICTURES_FOLDER_TAG, "");
-        if (!chosenFolder.isEmpty() ) {
+        if (!chosenFolder.isEmpty()) {
             populateFieldsWithExistingData();
         }
     }
@@ -173,7 +163,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         picsDriveFolder.getMetadata(mGoogleApiClient)
                 .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
                     @Override
-                    public void onResult(DriveResource.MetadataResult metadataResult) {
+                    public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
                         picturesFolderName = settings.getString(PICS_FOLDER_NAME_TAG, "");
                         pictureSelectionText.setText(picturesFolderName);
                         picturesFolderID = picsDriveId.getResourceId();
@@ -201,7 +191,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             textDriveFolder.getMetadata(mGoogleApiClient)
                     .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
                         @Override
-                        public void onResult(DriveResource.MetadataResult metadataResult) {
+                        public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
                             textFolderName = settings.getString(TEXT_FOLDER_NAME_TAG, "");
                             textSelectionText.setText(textFolderName);
                             textFolderID = textDriveId.getResourceId();
@@ -246,6 +236,10 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         }
     }
 
+    private void chooseAccount() {
+        startActivityForResult(
+                mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+    }
 
     private boolean isDeviceOnline() {
         ConnectivityManager connMgr =
@@ -254,70 +248,40 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         return (networkInfo != null && networkInfo.isConnected());
     }
 
-    private void chooseAccount() {
-        startActivityForResult(
-                mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-    }
-
-    private boolean isGooglePlayServicesAvailable() {
+    /**
+     * Check that Google Play services APK is installed and up to date. Will
+     * launch an error dialog for the user to update Google Play Services if
+     * possible.
+     * @return true if Google Play Services is available and up to
+     *     date on this device; false otherwise.
+     */
+    private boolean isGoogleAvailable() {
+        GoogleApiAvailability api = GoogleApiAvailability.getInstance();
         final int connectionStatusCode =
-                GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (GooglePlayServicesUtil.isUserRecoverableError(connectionStatusCode)) {
-            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode, Select_Folders.this);
+                api.isGooglePlayServicesAvailable(this);
+        if (api.isUserResolvableError(connectionStatusCode)) {
+            api.showErrorDialogFragment(this, connectionStatusCode, REQUEST_GOOGLE_PLAY_SERVICES);
             return false;
         } else if (connectionStatusCode != ConnectionResult.SUCCESS) {
+            String str = GoogleApiAvailability.getInstance().getErrorString(connectionStatusCode);
+            Toast.makeText(this, str, Toast.LENGTH_LONG).show();
             return false;
         }
         return true;
     }
 
-    void showGooglePlayServicesAvailabilityErrorDialog(
-            final int connectionStatusCode, Activity activity) {
-        Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
-                connectionStatusCode,
-                activity,
-                REQUEST_GOOGLE_PLAY_SERVICES);
-        dialog.show();
-    }
-
-    @Override
-    protected void onPause() {
-        /*if (mGoogleApiClient != null) {
-            mGoogleApiClient.disconnect();
-        }*/
-        super.onPause();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (!mResolvingError) {
-            mGoogleApiClient.connect();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        //mGoogleApiClient.disconnect();
-        super.onStop();
-    }
-
-
-    @Override
+   @Override
     protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
         // Make sure the app is not already connected or attempting to connect
+
         if (!mGoogleApiClient.isConnecting() &&
                 !mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
         }
-        if (requestCode == REQUEST_RESOLVE_ERROR) {
-            mResolvingError = false;
-            return;
-        }
         switch (requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
-                    isGooglePlayServicesAvailable();
+                    isGoogleAvailable();
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
@@ -329,12 +293,12 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                         mCredential.setSelectedAccountName(email);
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString("accountName", email).apply();
+                    }else if (resultCode == RESULT_CANCELED){
+                        new AlertDialog.Builder(this).setMessage("Account unspecified").show();
                     }
-                } else if (resultCode == RESULT_CANCELED) {
-                    new AlertDialog.Builder(Select_Folders.this)
-                            .setMessage("Account unspecified.").show();
                 }
-                break;
+                    break;
+
             case REQUEST_AUTHORIZATION:
                 if (resultCode != RESULT_OK) {
                     chooseAccount();
@@ -366,7 +330,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         driveFolder.getMetadata(mGoogleApiClient)
                 .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
                     @Override
-                    public void onResult(DriveResource.MetadataResult metadataResult) {
+                    public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
 
 
                         if (isImageCase) {
@@ -503,64 +467,21 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
 
     @Override
-    public void onConnectionFailed(ConnectionResult result) {
+    public void onConnectionFailed(@NonNull ConnectionResult result) {
         Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
-        if (mResolvingError) {
-            // Already attempting to resolve an error.
+        if (!result.hasResolution()) {
+            // show the localized error dialog.
+            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
             return;
-        } else if (result.hasResolution()) {
-            try {
-                mResolvingError = true;
-                result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
-            } catch (IntentSender.SendIntentException e) {
-                // There was an error with the resolution intent. Try again.
-                mGoogleApiClient.connect();
-            }
-            return;
-        } else
-            showErrorDialog(result.getErrorCode());
-        mResolvingError = true;
+        }
+        // The failure has a resolution. Resolve it.
+        // Called typically when the app is not yet authorized, and an
+        // authorization
+        // dialog is displayed to the user.
         try {
             result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
         } catch (IntentSender.SendIntentException e) {
             Log.e(TAG, "Exception while starting resolution activity", e);
-        }
-    }
-
-    // The rest of this code is all about building the error dialog
-
-    /* Creates a dialog for an error message */
-    private void showErrorDialog(int errorCode) {
-        // Create a fragment for the error dialog
-        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
-        // Pass the error that should be displayed
-        Bundle args = new Bundle();
-        args.putInt(DIALOG_ERROR, errorCode);
-        dialogFragment.setArguments(args);
-        dialogFragment.show(getFragmentManager(), "errorDialog");
-    }
-
-    /* Called from ErrorDialogFragment when the dialog is dismissed. */
-    public void onDialogDismissed() {
-        mResolvingError = false;
-    }
-
-    /* A fragment to display an error dialog */
-    public static class ErrorDialogFragment extends DialogFragment {
-        public ErrorDialogFragment() {
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Get the error code and retrieve the appropriate dialog
-            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
-            return GoogleApiAvailability.getInstance().getErrorDialog(
-                    this.getActivity(), errorCode, REQUEST_RESOLVE_ERROR);
-        }
-
-        @Override
-        public void onDismiss(DialogInterface dialog) {
-            ((Select_Folders) getActivity()).onDialogDismissed();
         }
     }
 

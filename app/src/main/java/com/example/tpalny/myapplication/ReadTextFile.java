@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
+import com.google.api.services.drive.Drive;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.io.InputStreamReader;
  * Created by tpalny on 20/12/2015.
  */
 public class ReadTextFile extends AsyncTask<Void, Void, String> {
+    private Drive mGOOSvc = SearchTask.mGOOSvc;
 
     @Override
     protected String doInBackground(Void... params) {
@@ -27,7 +29,7 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
 
             try {
                 resp =
-                        Select_Folders.mGOOSvc.getRequestFactory()
+                        mGOOSvc.getRequestFactory()
                                 .buildGetRequest(new GenericUrl(Select_Folders.textList
                                         .get(currentTextFileNum++).getDownloadUrl())).execute();
                 InputStream is = resp.getContent();

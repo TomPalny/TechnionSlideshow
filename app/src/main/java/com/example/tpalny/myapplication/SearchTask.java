@@ -1,10 +1,16 @@
 package com.example.tpalny.myapplication;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
@@ -12,6 +18,8 @@ import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.support.v4.app.ActivityCompat.startActivityForResult;
 
 /**
  * Created by Tom on 15/12/2015.
@@ -23,7 +31,7 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
     private String mTextFolderId = Select_Folders.textFolderID;
     private Boolean mIsImage = false;
     private Boolean mIsText = false;
-    private Drive mGOOSvc = Select_Folders.mGOOSvc;
+    protected static Drive mGOOSvc = null;
     private Context mContext;
 
     public SearchTask(Context context, Boolean isImage, Boolean isText) {
@@ -31,6 +39,10 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
         mIsImage = isImage;
         mIsText = isText;
         mContext = context;
+
+        mGOOSvc = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(),
+                Select_Folders.mCredential)
+                .setApplicationName("Technion Slideshow App").build();
 
     }
 
@@ -42,7 +54,9 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         try {
+            Select_Folders.connectToGoogleService(mContext);
             getDataFromApi();
+
         } catch (Exception e) {
             mLastError = e;
             cancel(true);
@@ -103,7 +117,8 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
             Toast.makeText(mContext, "No Image files in folder", Toast.LENGTH_LONG).show();
 
         }
-        if (mIsText && FullscreenSlideshow.noTextFoundMessageFirstTimeAppearance && Select_Folders.textList.size() == 0) {
+        if (mIsText && FullscreenSlideshow.noTextFoundMessageFirstTimeAppearance &&
+                Select_Folders.textList.size() == 0) {
             Toast.makeText(mContext, "No Text files in folder", Toast.LENGTH_LONG).show();
             FullscreenSlideshow.noTextFoundMessageFirstTimeAppearance = false;
 
@@ -113,10 +128,20 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onCancelled() {
         if (mLastError != null) {
+            if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
+                GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+                api.showErrorDialogFragment((Activity) mContext, ((GooglePlayServicesAvailabilityIOException) mLastError)
+                        .getConnectionStatusCode(), Select_Folders.REQUEST_GOOGLE_PLAY_SERVICES);
+            } else if (mLastError instanceof UserRecoverableAuthIOException) {
+                startActivityForResult((Activity) mContext,
+                        ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                        Select_Folders.REQUEST_AUTHORIZATION, null);
+            }else{
 
             new AlertDialog.Builder(mContext)
                     .setMessage("The following error occurred:\n"
                             + mLastError.getMessage()).show();
+            }
 
         } else {
             new AlertDialog.Builder(mContext)
