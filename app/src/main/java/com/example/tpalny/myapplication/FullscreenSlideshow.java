@@ -26,7 +26,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
     protected static ViewFlipper mViewFlipper;
     private Timer textUpdateTimer;
     private SharedPreferences settings;
-    protected static Boolean noTextFoundMessageFirstTimeAppearance;
+
 
 
     @Override
@@ -40,7 +40,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
         mViewFlipper = (ViewFlipper) findViewById(R.id.flipper);
         mViewFlipper.setInAnimation(this, R.anim.slide_in_from_right);
         mViewFlipper.setOutAnimation(this, R.anim.slide_out_to_left);
-        noTextFoundMessageFirstTimeAppearance = true;
+
     }
 
 

@@ -11,11 +11,15 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -30,7 +34,6 @@ import com.google.android.gms.drive.DriveResource;
 import com.google.android.gms.drive.OpenFileActivityBuilder;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.ExponentialBackOff;
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 
@@ -82,8 +85,10 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private String textFolderName = null;
     private ToggleButton toggle;
     protected static boolean isSlideShowWithText = false;
+    protected static Boolean noTextFoundMessageFirstTimeAppearance;
 
     private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
+    private boolean firstTry = true;
 
 
     @Override
@@ -98,6 +103,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         slideShowDelay = (EditText) findViewById(R.id.slideshow_delay);
         textScrollSpeed = (EditText) findViewById(R.id.text_scroll_speed);
         textFileRefreshRate = (EditText) findViewById(R.id.text_file_refresh_rate);
+        noTextFoundMessageFirstTimeAppearance = true;
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(com.google.android.gms.drive.Drive.API)
@@ -158,65 +164,88 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         if (driveIdDecode.isEmpty()) {
             return;
         }
+
         final DriveId picsDriveId = DriveId.decodeFromString(driveIdDecode);
         final DriveFolder picsDriveFolder = picsDriveId.asDriveFolder();
-        picsDriveFolder.getMetadata(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
-                    @Override
-                    public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
-                        picturesFolderName = settings.getString(PICS_FOLDER_NAME_TAG, "");
-                        pictureSelectionText.setText(picturesFolderName);
-                        picturesFolderID = picsDriveId.getResourceId();
-                        slideShowButton.setEnabled(true);
-                        slideShowButton.setAlpha(1);
-                        if (isDeviceOnline()) {
-                            new SearchTask(Select_Folders.this, true, false).execute();
 
-                        } else {
-                            new AlertDialog.Builder(Select_Folders.this)
-                                    .setMessage("No network connection available.").show();
-                        }
-                    }
-                });
+        TimerTask slowNetworkTask = new TimerTask() {
+            @Override
+            public void run() {
+                picsDriveFolder.getMetadata(mGoogleApiClient)
+                        .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
+                            @Override
+                            public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
+                                picturesFolderName = settings.getString(PICS_FOLDER_NAME_TAG, "");
+                                pictureSelectionText.setText(picturesFolderName);
+                                picturesFolderID = picsDriveId.getResourceId();
+                                slideShowButton.setEnabled(true);
+                                slideShowButton.setAlpha(1);
+                                if (isDeviceOnline()) {
+                                    new SearchTask(Select_Folders.this, true, false).execute();
 
-        textFolderID = settings.getString(TEXT_FOLDER_TAG, "");
-        if (!textFolderID.isEmpty()) {
-            driveIdDecode = settings.getString(TEXT_DRIVEID, "");
-            if (driveIdDecode.isEmpty()) {
-                return;
-            }
-            isSlideShowWithText = true;
-            final DriveId textDriveId = DriveId.decodeFromString(driveIdDecode);
-            final DriveFolder textDriveFolder = textDriveId.asDriveFolder();
-            textDriveFolder.getMetadata(mGoogleApiClient)
-                    .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
-                        @Override
-                        public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
-                            textFolderName = settings.getString(TEXT_FOLDER_NAME_TAG, "");
-                            textSelectionText.setText(textFolderName);
-                            textFolderID = textDriveId.getResourceId();
-                            if (isDeviceOnline()) {
-                                new SearchTask(Select_Folders.this, false, true).execute();
-
-                            } else {
-                                new AlertDialog.Builder(Select_Folders.this)
-                                        .setMessage("No network connection available.").show();
+                                } else {
+                                    Toast.makeText(Select_Folders.this,
+                                            "No network connection available, attempting again in 10 seconds, please be patient...",
+                                            Toast.LENGTH_LONG).show();
+                                }
                             }
-                        }
-                    });
+                        });
 
+                textFolderID = settings.getString(TEXT_FOLDER_TAG, "");
+                if (!textFolderID.isEmpty()) {
+                    String driveIdDecode = settings.getString(TEXT_DRIVEID, "");
+                    if (driveIdDecode.isEmpty()) {
+                        return;
+                    }
+                    isSlideShowWithText = true;
+                    final DriveId textDriveId = DriveId.decodeFromString(driveIdDecode);
+                    final DriveFolder textDriveFolder = textDriveId.asDriveFolder();
+                    textDriveFolder.getMetadata(mGoogleApiClient)
+                            .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
+                                @Override
+                                public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
+                                    textFolderName = settings.getString(TEXT_FOLDER_NAME_TAG, "");
+                                    textSelectionText.setText(textFolderName);
+                                    textFolderID = textDriveId.getResourceId();
+                                    if (isDeviceOnline()) {
+                                        new SearchTask(Select_Folders.this, false, true).execute();
 
+                                    } else {
+                                        Toast.makeText(Select_Folders.this,
+                                                "No network connection available, attempting again in 10 seconds, please be patient...",
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
+
+                }
+            }
+        };
+        Timer slowNetworkTimer = new Timer();
+
+        Boolean userCancelledSlideshow = settings.getBoolean(USER_CANCELLED_SLIDESHOW, true);
+        //this is the case of a restart after device rebooted during slideshow
+        if (!userCancelledSlideshow) {
+            slowNetworkTimer.schedule(slowNetworkTask, 11 * 1000);
+        } else {
+            slowNetworkTimer.schedule(slowNetworkTask, 500);
         }
+
+
         String delay = settings.getString(DELAY_TAG, "5");
         slideShowDelay.setText(delay);
         String scrollingSpeed = settings.getString(SCROLLING_SPEED, "5");
         textScrollSpeed.setText(scrollingSpeed);
         String refreshRate = settings.getString(REFRESH_RATE, "60");
         textFileRefreshRate.setText(refreshRate);
-        toggle.setChecked(settings.getString(START_ON_BOOT, "").equals("true"));
+        toggle.setChecked(settings.getString(START_ON_BOOT, "").
 
-        Boolean userCancelledSlideshow = settings.getBoolean(USER_CANCELLED_SLIDESHOW, true);
+                        equals("true")
+
+        );
+
         if (!userCancelledSlideshow) {
+            showToast();
             final Intent intent = new Intent(this, FullscreenSlideshow.class);
             TimerTask tt = new TimerTask() {
                 @Override
@@ -225,8 +254,43 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 }
             };
             Timer timer = new Timer();
-            Toast.makeText(this, "Please wait a few seconds, the slideshow is starting...", Toast.LENGTH_LONG).show();
-            timer.schedule(tt, 7000);
+            timer.schedule(tt, 16 * 1000);
+        }
+    }
+
+    private void showToast() {
+        LinearLayout layout = new LinearLayout(this);
+        layout.setBackgroundResource(R.color.myBackground);
+
+        TextView tv = new TextView(this);
+        // set the TextView properties like color, size etc
+
+        tv.setTextColor(ContextCompat.getColor(this, R.color.myToastText));
+        tv.setTextSize(50);
+
+        tv.setGravity(Gravity.CENTER);
+
+        // set the text you want to show in  Toast
+        tv.setText("The Slideshow will start in a few seconds...");
+
+        ImageView img = new ImageView(this);
+
+        // give the drawble resource for the ImageView
+        img.setImageResource(R.drawable.technion_logo);
+        img.setScaleType(ImageView.ScaleType.CENTER);
+        // add both the Views TextView and ImageView in layout
+        layout.addView(img);
+        layout.addView(tv);
+
+        Toast toast = new Toast(this); //context is object of Context write "this" if you are an Activity
+        // Set The layout as Toast View
+        toast.setView(layout);
+
+        // Position you toast here toast position is 50 dp from bottom you can give any integral value
+        toast.setGravity(Gravity.BOTTOM, 0, 50);
+        toast.setDuration(Toast.LENGTH_LONG);
+        for (int x = 0; x < 4; x++) {
+            toast.show();
         }
     }
 
@@ -252,8 +316,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
      * Check that Google Play services APK is installed and up to date. Will
      * launch an error dialog for the user to update Google Play Services if
      * possible.
+     *
      * @return true if Google Play Services is available and up to
-     *     date on this device; false otherwise.
+     * date on this device; false otherwise.
      */
     private boolean isGoogleAvailable() {
         GoogleApiAvailability api = GoogleApiAvailability.getInstance();
@@ -270,7 +335,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         return true;
     }
 
-   @Override
+    @Override
     protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
         // Make sure the app is not already connected or attempting to connect
 
@@ -293,11 +358,11 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                         mCredential.setSelectedAccountName(email);
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString("accountName", email).apply();
-                    }else if (resultCode == RESULT_CANCELED){
+                    } else if (resultCode == RESULT_CANCELED) {
                         new AlertDialog.Builder(this).setMessage("Account unspecified").show();
                     }
                 }
-                    break;
+                break;
 
             case REQUEST_AUTHORIZATION:
                 if (resultCode != RESULT_OK) {
