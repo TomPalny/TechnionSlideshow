@@ -266,7 +266,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         // set the TextView properties like color, size etc
 
         tv.setTextColor(ContextCompat.getColor(this, R.color.myToastText));
-        tv.setTextSize(50);
+        tv.setTextSize(30);
 
         tv.setGravity(Gravity.CENTER);
 

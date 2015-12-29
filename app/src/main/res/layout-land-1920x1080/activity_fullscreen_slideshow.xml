@@ -11,19 +11,9 @@
     <ViewFlipper
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/flipper">
+        android:id="@+id/flipper"
+        android:onClick="onImageClicked">
 
-        <ImageView
-            android:id="@+id/my_image1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:onClick="onImageClicked" />
-
-        <ImageView
-            android:id="@+id/my_image2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:onClick="onImageClicked" />
 
     </ViewFlipper>
 
@@ -34,7 +24,7 @@
         android:layout_margin="@dimen/activity_vertical_margin"
         android:textSize="40sp"
         android:textColor="#1a2aff"
-        android:id="@+id/my_text">
-         </com.example.tpalny.myapplication.ScrollTextView>
+        android:id="@+id/my_text"/>
+
 
 </RelativeLayout>

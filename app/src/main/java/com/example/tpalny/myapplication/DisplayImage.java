@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.widget.ImageView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.google.api.client.http.GenericUrl;
@@ -20,8 +21,6 @@ import java.io.InputStream;
 public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     private static int currentPic = 0;
     private Context mContext;
-    private ImageView mImageView1 = FullscreenSlideshow.mImageView1;
-    private ImageView mImageView2 = FullscreenSlideshow.mImageView2;
     private ViewFlipper mViewFlipper = FullscreenSlideshow.mViewFlipper;
     private Drive mGOOSvc = SearchTask.mGOOSvc;
 
@@ -31,50 +30,84 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Void... params) {
-        HttpResponse resp = null;
+        HttpResponse resp;
+        InputStream is;
         try {
             if (Select_Folders.imagesList.isEmpty()) {
                 return null;
             }
             currentPic = currentPic % Select_Folders.imagesList.size();
-            resp =
-                    mGOOSvc.getRequestFactory()
-                            .buildGetRequest(new GenericUrl(Select_Folders.imagesList
-                                    .get(currentPic++).getDownloadUrl())).execute();
-            InputStream is = resp.getContent();
+            GenericUrl url = new GenericUrl(Select_Folders.imagesList
+                    .get(currentPic++).getDownloadUrl());
+            resp = mGOOSvc.getRequestFactory().buildGetRequest(url).execute();
+            is = resp.getContent();
 
-            return BitmapFactory.decodeStream(is);
-        } catch (IOException e) {
-            // An error occurred.
-            e.printStackTrace();
-        } finally {
-            if (resp != null) {
-                try {
-                    resp.disconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(is, null, options);
+
+
+            final int imageHeight = options.outHeight;
+            final int imageWidth = options.outWidth;
+
+            int inSampleSize = 1;
+
+            if (imageHeight > FullscreenSlideshow.heightPixels || imageWidth > FullscreenSlideshow.widthPixels) {
+
+                final int halfHeight = imageHeight / 2;
+                final int halfWidth = imageWidth / 2;
+
+                // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+                // height and width larger than the requested height and width.
+                while ((halfHeight / inSampleSize) > FullscreenSlideshow.heightPixels
+                        && (halfWidth / inSampleSize) > FullscreenSlideshow.widthPixels) {
+                    inSampleSize *= 2;
                 }
             }
 
+            options.inJustDecodeBounds = false;
+            Bitmap bm = null;
+            while (bm == null) {
+                options.inSampleSize = inSampleSize;
+
+                // Decode bitmap with inSampleSize set
+
+                is.close();
+                resp.disconnect();
+                resp = mGOOSvc.getRequestFactory().buildGetRequest(url).execute();
+                is = resp.getContent();
+                try {
+                    bm = BitmapFactory.decodeStream(is, null, options);
+                } catch (OutOfMemoryError e) {
+                    inSampleSize *= 2;
+                }
+            }
+            is.close();
+            resp.disconnect();
+            return bm;
+
+
+        } catch (IOException e) {
+            // An error occurred.
+            e.printStackTrace();
         }
         return null;
 
     }
 
+
     @Override
     protected void onPostExecute(Bitmap bm) {
 
-        if (currentPic == Select_Folders.imagesList.size() || bm == null) {
-            new SearchTask(mContext, true, false).execute();
+        if (currentPic == Select_Folders.imagesList.size() ) {
+            Toast.makeText(mContext, "Finished loading images, num of Images= "+Select_Folders.imagesList.size(), Toast.LENGTH_SHORT).show();
+            //new SearchTask(mContext, true, false).execute();
+        }else if (bm == null){
+            Toast.makeText(mContext, "bm = null!", Toast.LENGTH_SHORT).show();
         }
-        if (currentPic % 2 == 0) {
-            mImageView1.setImageBitmap(bm);
-            mViewFlipper.setDisplayedChild(0);
-
-        } else {
-            mImageView2.setImageBitmap(bm);
-            mViewFlipper.setDisplayedChild(1);
-        }
+        ImageView imageView = new ImageView(mContext);
+        imageView.setImageBitmap(bm);
+        mViewFlipper.addView(imageView);
 
     }
 }

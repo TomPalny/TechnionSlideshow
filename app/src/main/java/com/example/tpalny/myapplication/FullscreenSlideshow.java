@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -18,15 +19,12 @@ public class FullscreenSlideshow extends AppCompatActivity {
 
 
     private static final int MAX_NUM_OF_ATTEMPTS = 10;
-    protected static ImageView mImageView1;
-    protected static ImageView mImageView2;
     protected static ScrollTextView mText;
-    private Timer picturesChangeTimer;
-    private TimerTask timerTask;
     protected static ViewFlipper mViewFlipper;
     private Timer textUpdateTimer;
     private SharedPreferences settings;
-
+    protected static int heightPixels;
+    protected static int widthPixels;
 
 
     @Override
@@ -34,12 +32,14 @@ public class FullscreenSlideshow extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen_slideshow);
         settings = getSharedPreferences("com.example.tpalny.myapplication_preferences", Context.MODE_PRIVATE);
-        mImageView1 = (ImageView) findViewById(R.id.my_image1);
-        mImageView2 = (ImageView) findViewById(R.id.my_image2);
         mText = (ScrollTextView) findViewById(R.id.my_text);
         mViewFlipper = (ViewFlipper) findViewById(R.id.flipper);
         mViewFlipper.setInAnimation(this, R.anim.slide_in_from_right);
         mViewFlipper.setOutAnimation(this, R.anim.slide_out_to_left);
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        heightPixels = metrics.heightPixels;
+        widthPixels = metrics.widthPixels;
 
     }
 
@@ -50,12 +50,11 @@ public class FullscreenSlideshow extends AppCompatActivity {
         int x = 0;
         while (Select_Folders.imagesList == null) {
             x++;
-            if (x >= MAX_NUM_OF_ATTEMPTS) {
+            if (x > MAX_NUM_OF_ATTEMPTS) {
                 x = 0;
-
-                cancelTimer(picturesChangeTimer);
+                mViewFlipper.stopFlipping();
                 cancelTimer(textUpdateTimer);
-                Toast.makeText(this, "Network is slow, images didn't load", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Network is slow, images didn't load", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
@@ -81,41 +80,30 @@ public class FullscreenSlideshow extends AppCompatActivity {
     public void onBackPressed() {
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
-        cancelTimer(picturesChangeTimer);
+        mViewFlipper.stopFlipping();
         cancelTimer(textUpdateTimer);
 
         super.onBackPressed();
     }
 
     public void startTimer() {
-        //set a new Timer
-        picturesChangeTimer = new Timer();
-
-        //initialize the TimerTask's job
-        initializeTimerTask();
 
         Integer delay = Integer.parseInt(Select_Folders.slideShowDelay.getText().toString());
-        picturesChangeTimer.schedule(timerTask, 0, delay * 1000);
-    }
-
-    public void initializeTimerTask() {
-
-        timerTask = new TimerTask() {
-            public void run() {
-
-                new DisplayImage(FullscreenSlideshow.this)
-                        .execute();
-
-            }
-
-        };
+        mViewFlipper.setFlipInterval(delay * 1000);
+        int counter = 0;
+        while (counter++ < Select_Folders.imagesList.size()) {
+            new DisplayImage(FullscreenSlideshow.this)
+                    .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        }
+        mViewFlipper.startFlipping();
 
     }
+
 
     public void onImageClicked(View view) {
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
-        cancelTimer(picturesChangeTimer);
+        mViewFlipper.stopFlipping();
         cancelTimer(textUpdateTimer);
         finish();
     }
