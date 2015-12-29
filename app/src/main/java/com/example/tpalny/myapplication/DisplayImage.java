@@ -19,9 +19,11 @@ import java.io.InputStream;
  * Created by tpalny on 20/12/2015.
  */
 public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
-    private static int currentPic = 0;
+    protected static int currentPic = 0;
     private Context mContext;
     private ViewFlipper mViewFlipper = FullscreenSlideshow.mViewFlipper;
+    private ImageView im1 = FullscreenSlideshow.imageView1;
+    private ImageView im2 = FullscreenSlideshow.imageView2;
     private Drive mGOOSvc = SearchTask.mGOOSvc;
 
     DisplayImage(Context context) {
@@ -99,15 +101,20 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bm) {
 
-        if (currentPic == Select_Folders.imagesList.size() ) {
-            Toast.makeText(mContext, "Finished loading images, num of Images= "+Select_Folders.imagesList.size(), Toast.LENGTH_SHORT).show();
+        if (currentPic == Select_Folders.imagesList.size()) {
+            Select_Folders.loadPicsTimer.cancel();
+            Toast.makeText(mContext, "Finished loading images, num of Images= " + Select_Folders.imagesList.size(), Toast.LENGTH_SHORT).show();
             //new SearchTask(mContext, true, false).execute();
-        }else if (bm == null){
+        } else if (bm == null) {
             Toast.makeText(mContext, "bm = null!", Toast.LENGTH_SHORT).show();
         }
-        ImageView imageView = new ImageView(mContext);
-        imageView.setImageBitmap(bm);
-        mViewFlipper.addView(imageView);
+        if (currentPic % 2 == 0) {
+            im1.setImageBitmap(bm);
+
+        } else {
+            im2.setImageBitmap(bm);
+        }
+
 
     }
 }

@@ -86,9 +86,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private ToggleButton toggle;
     protected static boolean isSlideShowWithText = false;
     protected static Boolean noTextFoundMessageFirstTimeAppearance;
+    protected static Timer loadPicsTimer;
 
     private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
-    private boolean firstTry = true;
 
 
     @Override
@@ -104,7 +104,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         textScrollSpeed = (EditText) findViewById(R.id.text_scroll_speed);
         textFileRefreshRate = (EditText) findViewById(R.id.text_file_refresh_rate);
         noTextFoundMessageFirstTimeAppearance = true;
-
+        loadPicsTimer = new Timer();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(com.google.android.gms.drive.Drive.API)
                 .addScope(com.google.android.gms.drive.Drive.SCOPE_FILE)
@@ -144,7 +144,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     @Override
     protected void onResume() {
         super.onResume();
-
+        DisplayImage.currentPic = 0;
+        loadPicsTimer.cancel();
         if (isGoogleAvailable()) {
             refreshResults();
         } else {

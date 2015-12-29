@@ -25,6 +25,9 @@ public class FullscreenSlideshow extends AppCompatActivity {
     private SharedPreferences settings;
     protected static int heightPixels;
     protected static int widthPixels;
+    private Timer loadPicsTimer = Select_Folders.loadPicsTimer;
+    protected static ImageView imageView1;
+    protected static ImageView imageView2;
 
 
     @Override
@@ -36,6 +39,10 @@ public class FullscreenSlideshow extends AppCompatActivity {
         mViewFlipper = (ViewFlipper) findViewById(R.id.flipper);
         mViewFlipper.setInAnimation(this, R.anim.slide_in_from_right);
         mViewFlipper.setOutAnimation(this, R.anim.slide_out_to_left);
+        imageView1 = new ImageView(this);
+        imageView2 = new ImageView(this);
+        mViewFlipper.addView(imageView1);
+        mViewFlipper.addView(imageView2);
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         heightPixels = metrics.heightPixels;
@@ -54,7 +61,6 @@ public class FullscreenSlideshow extends AppCompatActivity {
                 x = 0;
                 mViewFlipper.stopFlipping();
                 cancelTimer(textUpdateTimer);
-                Toast.makeText(this, "Network is slow, images didn't load", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
@@ -76,27 +82,34 @@ public class FullscreenSlideshow extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onBackPressed() {
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
-        mViewFlipper.stopFlipping();
-        cancelTimer(textUpdateTimer);
-
-        super.onBackPressed();
-    }
 
     public void startTimer() {
 
         Integer delay = Integer.parseInt(Select_Folders.slideShowDelay.getText().toString());
         mViewFlipper.setFlipInterval(delay * 1000);
-        int counter = 0;
-        while (counter++ < Select_Folders.imagesList.size()) {
-            new DisplayImage(FullscreenSlideshow.this)
-                    .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-        }
-        mViewFlipper.startFlipping();
+        TimerTask loadPicsTask = new TimerTask() {
+            @Override
+            public void run() {
+                new DisplayImage(FullscreenSlideshow.this)
+                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+        };
+        loadPicsTimer = new Timer();
 
+        loadPicsTimer.schedule(loadPicsTask, 0, delay * 1000);
+        if (DisplayImage.currentPic == Select_Folders.imagesList.size()) {
+            cancelTimer(loadPicsTimer);
+        }
+        /*TimerTask flipTask = new TimerTask() {
+            @Override
+            public void run() {
+                mViewFlipper.startFlipping();
+
+            }
+        };
+        Timer flipTimer = new Timer();
+        flipTimer.schedule(flipTask, 10 * 1000);*/
+        mViewFlipper.startFlipping();
     }
 
 
@@ -105,7 +118,19 @@ public class FullscreenSlideshow extends AppCompatActivity {
         editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
         mViewFlipper.stopFlipping();
         cancelTimer(textUpdateTimer);
+        cancelTimer(loadPicsTimer);
         finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
+        mViewFlipper.stopFlipping();
+        cancelTimer(textUpdateTimer);
+        cancelTimer(loadPicsTimer);
+
+        super.onBackPressed();
     }
 
     private void cancelTimer(Timer t) {
