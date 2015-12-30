@@ -6,7 +6,8 @@
     tools:context="com.example.tpalny.myapplication.FullscreenSlideshow"
     android:keepScreenOn="true"
     android:animateLayoutChanges="true"
-    android:background="#ffffff">
+    android:background="#ffffff"
+    android:id="@+id/root_view">
 
     <ViewFlipper
         android:layout_width="match_parent"

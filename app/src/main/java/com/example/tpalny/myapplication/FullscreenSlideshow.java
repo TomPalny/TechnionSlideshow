@@ -7,8 +7,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import java.util.Timer;
@@ -28,6 +28,8 @@ public class FullscreenSlideshow extends AppCompatActivity {
     private Timer loadPicsTimer = Select_Folders.loadPicsTimer;
     protected static ImageView imageView1;
     protected static ImageView imageView2;
+    protected static ImageView imageView3;
+    protected static ImageView imageView4;
 
 
     @Override
@@ -39,10 +41,10 @@ public class FullscreenSlideshow extends AppCompatActivity {
         mViewFlipper = (ViewFlipper) findViewById(R.id.flipper);
         mViewFlipper.setInAnimation(this, R.anim.slide_in_from_right);
         mViewFlipper.setOutAnimation(this, R.anim.slide_out_to_left);
-        imageView1 = new ImageView(this);
-        imageView2 = new ImageView(this);
-        mViewFlipper.addView(imageView1);
-        mViewFlipper.addView(imageView2);
+        imageView1 = (ImageView) findViewById(R.id.im1);
+        imageView2 = (ImageView) findViewById(R.id.im2);
+        imageView3 = (ImageView) findViewById(R.id.im3);
+        imageView4 = (ImageView) findViewById(R.id.im4);
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         heightPixels = metrics.heightPixels;
@@ -59,7 +61,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
             x++;
             if (x > MAX_NUM_OF_ATTEMPTS) {
                 x = 0;
-                mViewFlipper.stopFlipping();
+                //mViewFlipper.stopFlipping();
                 cancelTimer(textUpdateTimer);
                 finish();
             }
@@ -86,37 +88,29 @@ public class FullscreenSlideshow extends AppCompatActivity {
     public void startTimer() {
 
         Integer delay = Integer.parseInt(Select_Folders.slideShowDelay.getText().toString());
-        mViewFlipper.setFlipInterval(delay * 1000);
+        //mViewFlipper.setFlipInterval(delay * 1000);
         TimerTask loadPicsTask = new TimerTask() {
             @Override
             public void run() {
                 new DisplayImage(FullscreenSlideshow.this)
-                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        .execute();
             }
         };
         loadPicsTimer = new Timer();
 
         loadPicsTimer.schedule(loadPicsTask, 0, delay * 1000);
-        if (DisplayImage.currentPic == Select_Folders.imagesList.size()) {
+        /*if (DisplayImage.currentPic == Select_Folders.imagesList.size()) {
             cancelTimer(loadPicsTimer);
-        }
-        /*TimerTask flipTask = new TimerTask() {
-            @Override
-            public void run() {
-                mViewFlipper.startFlipping();
+        }*/
 
-            }
-        };
-        Timer flipTimer = new Timer();
-        flipTimer.schedule(flipTask, 10 * 1000);*/
-        mViewFlipper.startFlipping();
+        //mViewFlipper.startFlipping();
     }
 
 
     public void onImageClicked(View view) {
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
-        mViewFlipper.stopFlipping();
+        //mViewFlipper.stopFlipping();
         cancelTimer(textUpdateTimer);
         cancelTimer(loadPicsTimer);
         finish();
@@ -126,7 +120,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
     public void onBackPressed() {
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
-        mViewFlipper.stopFlipping();
+        //mViewFlipper.stopFlipping();
         cancelTimer(textUpdateTimer);
         cancelTimer(loadPicsTimer);
 
@@ -140,6 +134,26 @@ public class FullscreenSlideshow extends AppCompatActivity {
 
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unbindDrawables(findViewById(R.id.root_view));
+        System.gc();
+    }
+
+    private void unbindDrawables(View view) {
+        if (view.getBackground() != null) {
+            view.getBackground().setCallback(null);
+        }
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                unbindDrawables(((ViewGroup) view).getChildAt(i));
+            }
+            ((ViewGroup) view).removeAllViews();
+        }
     }
 
 }

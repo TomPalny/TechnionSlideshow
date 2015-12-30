@@ -435,7 +435,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     public void onPicturesSelectClicked(View view) {
         reconnectToGoogleApi();
-
         intentSender = com.google.android.gms.drive.Drive.DriveApi
                 .newOpenFileActivityBuilder()
                 .setMimeType(new String[]{DriveFolder.MIME_TYPE})

@@ -24,7 +24,14 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     private ViewFlipper mViewFlipper = FullscreenSlideshow.mViewFlipper;
     private ImageView im1 = FullscreenSlideshow.imageView1;
     private ImageView im2 = FullscreenSlideshow.imageView2;
+    private ImageView im3 = FullscreenSlideshow.imageView3;
+    private ImageView im4 = FullscreenSlideshow.imageView4;
     private Drive mGOOSvc = SearchTask.mGOOSvc;
+    private Bitmap bm1 = null;
+    private Bitmap bm2 = null;
+    private Bitmap bm3 = null;
+    private Bitmap bm4 = null;
+
 
     DisplayImage(Context context) {
         mContext = context;
@@ -67,8 +74,12 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
                 }
             }
 
+
             options.inJustDecodeBounds = false;
+
             Bitmap bm = null;
+
+
             while (bm == null) {
                 options.inSampleSize = inSampleSize;
 
@@ -84,9 +95,24 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
                     inSampleSize *= 2;
                 }
             }
+
+
             is.close();
             resp.disconnect();
-            return bm;
+
+            if (bm1 == null || bm1.isRecycled() ) {
+                bm1 = bm;
+                return bm1;
+            } else if (bm2 == null || bm2.isRecycled()) {
+                bm2 = bm;
+                return bm2;
+            } else if (bm3 == null || bm3.isRecycled()){
+                bm3 = bm;
+                return bm3;
+            } else {
+                bm4 = bm;
+                return bm4;
+            }
 
 
         } catch (IOException e) {
@@ -101,18 +127,41 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bm) {
 
-        if (currentPic == Select_Folders.imagesList.size()) {
-            Select_Folders.loadPicsTimer.cancel();
-            Toast.makeText(mContext, "Finished loading images, num of Images= " + Select_Folders.imagesList.size(), Toast.LENGTH_SHORT).show();
-            //new SearchTask(mContext, true, false).execute();
-        } else if (bm == null) {
-            Toast.makeText(mContext, "bm = null!", Toast.LENGTH_SHORT).show();
-        }
-        if (currentPic % 2 == 0) {
-            im1.setImageBitmap(bm);
+        if (currentPic == Select_Folders.imagesList.size() || bm == null) {
+            //Toast.makeText(mContext, "Finished loading images, num of Images= " + Select_Folders.imagesList.size(), Toast.LENGTH_SHORT).show();
+            new SearchTask(mContext, true, false).execute();
 
-        } else {
+        } /*else if (bm == null) {
+            Toast.makeText(mContext, "Internet Connection Lost", Toast.LENGTH_SHORT).show();
+        }*/
+        if (currentPic % 4 == 0) {
+
+            im4.setImageBitmap(bm);
+            mViewFlipper.setDisplayedChild(3);
+
+
+        } else if (currentPic % 4 == 1) {
+
+            im1.setImageBitmap(bm);
+            mViewFlipper.setDisplayedChild(0);
+
+        } else if (currentPic % 4 == 2){
             im2.setImageBitmap(bm);
+            mViewFlipper.setDisplayedChild(1);
+
+        }else{
+            im3.setImageBitmap(bm);
+            mViewFlipper.setDisplayedChild(2);
+        }
+
+        if (currentPic % 4 == 0) {
+            im1.setImageBitmap(null);
+        } else if (currentPic % 4 == 1) {
+            im2.setImageBitmap(null);
+        } else if (currentPic % 4 == 2){
+            im3.setImageBitmap(null);
+        }else{
+            im4.setImageBitmap(null);
         }
 
 
