@@ -8,6 +8,7 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
@@ -182,7 +183,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                                 slideShowButton.setEnabled(true);
                                 slideShowButton.setAlpha(1);
                                 if (isDeviceOnline()) {
-                                    new SearchTask(Select_Folders.this, true, false).execute();
+                                    new SearchTask(Select_Folders.this, true, false)
+                                            .execute();
 
                                 } else {
                                     Toast.makeText(Select_Folders.this,
@@ -209,7 +211,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                                     textSelectionText.setText(textFolderName);
                                     textFolderID = textDriveId.getResourceId();
                                     if (isDeviceOnline()) {
-                                        new SearchTask(Select_Folders.this, false, true).execute();
+                                        new SearchTask(Select_Folders.this, false, true)
+                                                .execute();
 
                                     } else {
                                         Toast.makeText(Select_Folders.this,
@@ -408,8 +411,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                             slideShowButton.setEnabled(true);
                             slideShowButton.setAlpha(1);
                             if (isDeviceOnline()) {
-                                new SearchTask(Select_Folders.this, true, false).execute();
-
+                                new SearchTask(Select_Folders.this, true, false)
+                                        .execute();
                             } else {
                                 new AlertDialog.Builder(Select_Folders.this)
                                         .setMessage("No network connection available.").show();
@@ -422,7 +425,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                             editor.putString(TEXT_FOLDER_NAME_TAG, textFolderName).apply();
                             textSelectionText.setText(textFolderName);
                             if (isDeviceOnline()) {
-                                new SearchTask(Select_Folders.this, false, true).execute();
+                                new SearchTask(Select_Folders.this, false, true)
+                                        .execute();
 
                             } else {
                                 new AlertDialog.Builder(Select_Folders.this)

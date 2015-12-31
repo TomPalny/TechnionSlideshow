@@ -1,31 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.tpalny.myapplication.FullscreenSlideshow"
-    android:keepScreenOn="true"
-    android:animateLayoutChanges="true"
     android:background="#ffffff"
-    android:id="@+id/root_view">
+    android:keepScreenOn="true"
+    tools:context="com.example.tpalny.myapplication.FullscreenSlideshow">
 
     <ViewFlipper
+        android:id="@+id/flipper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/flipper"
         android:onClick="onImageClicked">
 
+        <ImageView
+            android:id="@+id/im1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/im2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/im3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/im4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </ViewFlipper>
 
+
     <com.example.tpalny.myapplication.ScrollTextView
+        android:id="@+id/my_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/flipper"
         android:layout_margin="@dimen/activity_vertical_margin"
-        android:textSize="40sp"
         android:textColor="#1a2aff"
-        android:id="@+id/my_text"/>
+        android:textSize="40sp" />
 
 
 </RelativeLayout>
+

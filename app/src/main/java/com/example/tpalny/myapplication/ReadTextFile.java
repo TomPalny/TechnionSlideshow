@@ -2,8 +2,10 @@ package com.example.tpalny.myapplication;
 
 import android.os.AsyncTask;
 
+import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 
 import java.io.BufferedReader;
@@ -34,7 +36,7 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
                                         .get(currentTextFileNum++).getDownloadUrl())).execute();
                 InputStream is = resp.getContent();
 
-                BufferedReader r = new BufferedReader(new InputStreamReader(is));
+                BufferedReader r = new BufferedReader(new InputStreamReader(is, "UTF-8"));
                 StringBuilder total = new StringBuilder(is.available());
                 String line;
                 while ((line = r.readLine()) != null) {

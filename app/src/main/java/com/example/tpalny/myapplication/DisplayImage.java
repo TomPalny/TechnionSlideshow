@@ -1,17 +1,20 @@
 package com.example.tpalny.myapplication;
 
+import android.animation.TimeInterpolator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.view.ViewPropertyAnimator;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.services.drive.Drive;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,16 +34,20 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     private Bitmap bm2 = null;
     private Bitmap bm3 = null;
     private Bitmap bm4 = null;
+    private static final int[] inAnimation = {R.anim.abc_fade_in, R.anim.abc_grow_fade_in_from_bottom, R.anim.abc_popup_enter, R.anim.abc_slide_in_bottom, R.anim.abc_slide_in_top, R.anim.slide_in_from_right};
+    private static final int[] outAnimation = {R.anim.abc_fade_out, R.anim.abc_shrink_fade_out_from_bottom, R.anim.abc_popup_exit, R.anim.abc_slide_out_top, R.anim.abc_slide_out_bottom, R.anim.slide_out_to_left};
+    private int i = FullscreenSlideshow.i;
 
 
     DisplayImage(Context context) {
         mContext = context;
+
     }
 
     @Override
     protected Bitmap doInBackground(Void... params) {
-        HttpResponse resp;
-        InputStream is;
+        HttpResponse resp = null;
+        InputStream is = null;
         try {
             if (Select_Folders.imagesList.isEmpty()) {
                 return null;
@@ -54,7 +61,7 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeStream(is, null, options);
-
+            is.close();
 
             final int imageHeight = options.outHeight;
             final int imageWidth = options.outWidth;
@@ -74,20 +81,18 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
                 }
             }
 
-
             options.inJustDecodeBounds = false;
-
             Bitmap bm = null;
-
 
             while (bm == null) {
                 options.inSampleSize = inSampleSize;
 
                 // Decode bitmap with inSampleSize set
 
-                is.close();
-                resp.disconnect();
+                //is.close();
+                //resp.disconnect();
                 resp = mGOOSvc.getRequestFactory().buildGetRequest(url).execute();
+
                 is = resp.getContent();
                 try {
                     bm = BitmapFactory.decodeStream(is, null, options);
@@ -97,19 +102,16 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
             }
 
 
-            is.close();
-            resp.disconnect();
-
-            if (bm1 == null || bm1.isRecycled() ) {
+            if (bm1 == null || bm1.isRecycled()) {
                 bm1 = bm;
                 return bm1;
             } else if (bm2 == null || bm2.isRecycled()) {
                 bm2 = bm;
                 return bm2;
-            } else if (bm3 == null || bm3.isRecycled()){
+            } else if (bm3 == null || bm3.isRecycled()) {
                 bm3 = bm;
                 return bm3;
-            } else {
+            } else if (bm4 == null || bm4.isRecycled()) {
                 bm4 = bm;
                 return bm4;
             }
@@ -118,6 +120,21 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
         } catch (IOException e) {
             // An error occurred.
             e.printStackTrace();
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (resp != null) {
+                try {
+                    resp.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return null;
 
@@ -126,41 +143,44 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap bm) {
+        mViewFlipper.setInAnimation(mContext, inAnimation[i]);
+        mViewFlipper.setOutAnimation(mContext, outAnimation[i]);
+
+
 
         if (currentPic == Select_Folders.imagesList.size() || bm == null) {
             //Toast.makeText(mContext, "Finished loading images, num of Images= " + Select_Folders.imagesList.size(), Toast.LENGTH_SHORT).show();
-            new SearchTask(mContext, true, false).execute();
+            FullscreenSlideshow.i = (++i) % inAnimation.length;
+            new SearchTask(mContext, true, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
         } /*else if (bm == null) {
             Toast.makeText(mContext, "Internet Connection Lost", Toast.LENGTH_SHORT).show();
         }*/
         if (currentPic % 4 == 0) {
-
             im4.setImageBitmap(bm);
-            mViewFlipper.setDisplayedChild(3);
+            mViewFlipper.setDisplayedChild(2);
 
 
         } else if (currentPic % 4 == 1) {
-
             im1.setImageBitmap(bm);
+            mViewFlipper.setDisplayedChild(3);
+
+        } else if (currentPic % 4 == 2) {
+            im2.setImageBitmap(bm);
             mViewFlipper.setDisplayedChild(0);
 
-        } else if (currentPic % 4 == 2){
-            im2.setImageBitmap(bm);
-            mViewFlipper.setDisplayedChild(1);
-
-        }else{
+        } else if (currentPic % 4 == 3) {
             im3.setImageBitmap(bm);
-            mViewFlipper.setDisplayedChild(2);
+            mViewFlipper.setDisplayedChild(1);
         }
 
         if (currentPic % 4 == 0) {
             im1.setImageBitmap(null);
         } else if (currentPic % 4 == 1) {
             im2.setImageBitmap(null);
-        } else if (currentPic % 4 == 2){
+        } else if (currentPic % 4 == 2) {
             im3.setImageBitmap(null);
-        }else{
+        } else if (currentPic % 4 == 3) {
             im4.setImageBitmap(null);
         }
 

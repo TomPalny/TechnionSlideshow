@@ -30,6 +30,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
     protected static ImageView imageView2;
     protected static ImageView imageView3;
     protected static ImageView imageView4;
+    protected static int i = 0;
 
 
     @Override
@@ -39,8 +40,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
         settings = getSharedPreferences("com.example.tpalny.myapplication_preferences", Context.MODE_PRIVATE);
         mText = (ScrollTextView) findViewById(R.id.my_text);
         mViewFlipper = (ViewFlipper) findViewById(R.id.flipper);
-        mViewFlipper.setInAnimation(this, R.anim.slide_in_from_right);
-        mViewFlipper.setOutAnimation(this, R.anim.slide_out_to_left);
+
         imageView1 = (ImageView) findViewById(R.id.im1);
         imageView2 = (ImageView) findViewById(R.id.im2);
         imageView3 = (ImageView) findViewById(R.id.im3);
@@ -62,7 +62,6 @@ public class FullscreenSlideshow extends AppCompatActivity {
             if (x > MAX_NUM_OF_ATTEMPTS) {
                 x = 0;
                 //mViewFlipper.stopFlipping();
-                cancelTimer(textUpdateTimer);
                 finish();
             }
         }
@@ -72,8 +71,8 @@ public class FullscreenSlideshow extends AppCompatActivity {
             TimerTask textUpdateTask = new TimerTask() {
                 @Override
                 public void run() {
-                    new SearchTask(FullscreenSlideshow.this, false, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                    new ReadTextFile().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                    new SearchTask(FullscreenSlideshow.this, false, true).execute();
+                    new ReadTextFile().execute();
                 }
             };
             textUpdateTimer = new Timer();
@@ -93,17 +92,14 @@ public class FullscreenSlideshow extends AppCompatActivity {
             @Override
             public void run() {
                 new DisplayImage(FullscreenSlideshow.this)
-                        .execute();
+                        .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
             }
         };
         loadPicsTimer = new Timer();
 
         loadPicsTimer.schedule(loadPicsTask, 0, delay * 1000);
-        /*if (DisplayImage.currentPic == Select_Folders.imagesList.size()) {
-            cancelTimer(loadPicsTimer);
-        }*/
-
-        //mViewFlipper.startFlipping();
+        new DisplayImage(FullscreenSlideshow.this)
+                .execute();
     }
 
 
@@ -111,8 +107,10 @@ public class FullscreenSlideshow extends AppCompatActivity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
         //mViewFlipper.stopFlipping();
-        cancelTimer(textUpdateTimer);
-        cancelTimer(loadPicsTimer);
+        textUpdateTimer.cancel();
+        textUpdateTimer.purge();
+        loadPicsTimer.cancel();
+        loadPicsTimer.purge();
         finish();
     }
 
@@ -121,20 +119,14 @@ public class FullscreenSlideshow extends AppCompatActivity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
         //mViewFlipper.stopFlipping();
-        cancelTimer(textUpdateTimer);
-        cancelTimer(loadPicsTimer);
+        textUpdateTimer.cancel();
+        textUpdateTimer.purge();
+        loadPicsTimer.cancel();
+        loadPicsTimer.purge();
 
         super.onBackPressed();
     }
 
-    private void cancelTimer(Timer t) {
-        //stop the timer, if it's not already null
-        if (t != null) {
-            t.cancel();
-
-        }
-
-    }
 
     @Override
     protected void onDestroy() {
