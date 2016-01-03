@@ -4,7 +4,7 @@
 
     <translate
 
-        android:duration="1500"
+        android:duration="@integer/longAnimTime"
 
         android:fromXDelta="0%"
 
@@ -12,6 +12,8 @@
 
         android:toXDelta="-100%"
 
-        android:toYDelta="0%" />
+        android:toYDelta="0%"
+
+        android:interpolator="@anim/accelerate_interpolator"/>
 
 </set>

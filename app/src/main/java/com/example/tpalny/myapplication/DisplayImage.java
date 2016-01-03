@@ -1,12 +1,9 @@
 package com.example.tpalny.myapplication;
 
-import android.animation.TimeInterpolator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.view.ViewPropertyAnimator;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ViewFlipper;
 
@@ -14,7 +11,6 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.services.drive.Drive;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -30,6 +26,7 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     private ImageView im3 = FullscreenSlideshow.imageView3;
     private ImageView im4 = FullscreenSlideshow.imageView4;
     private Drive mGOOSvc = SearchTask.mGOOSvc;
+    private final int animationChangeCounter = 5;
     private Bitmap bm1 = null;
     private Bitmap bm2 = null;
     private Bitmap bm3 = null;
@@ -87,6 +84,7 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
 
             options.inJustDecodeBounds = false;
             Bitmap bm = null;
+
 
             while (bm == null) {
                 options.inSampleSize = inSampleSize;
@@ -149,12 +147,14 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     protected void onPostExecute(Bitmap bm) {
         mViewFlipper.setInAnimation(mContext, inAnimation[i]);
         mViewFlipper.setOutAnimation(mContext, outAnimation[i]);
-
+        if (i % animationChangeCounter == 0) {
+            FullscreenSlideshow.i = (++i) % inAnimation.length;
+        }
 
 
         if (currentPic == Select_Folders.imagesList.size() || bm == null) {
             //Toast.makeText(mContext, "Finished loading images, num of Images= " + Select_Folders.imagesList.size(), Toast.LENGTH_SHORT).show();
-            FullscreenSlideshow.i = (++i) % inAnimation.length;
+
             new SearchTask(mContext, true, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
         } /*else if (bm == null) {

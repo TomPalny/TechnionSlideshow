@@ -107,10 +107,8 @@ public class FullscreenSlideshow extends AppCompatActivity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
         //mViewFlipper.stopFlipping();
-        textUpdateTimer.cancel();
-        textUpdateTimer.purge();
-        loadPicsTimer.cancel();
-        loadPicsTimer.purge();
+        cancelTimer(textUpdateTimer);
+        cancelTimer(loadPicsTimer);
         finish();
     }
 
@@ -119,12 +117,17 @@ public class FullscreenSlideshow extends AppCompatActivity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
         //mViewFlipper.stopFlipping();
-        textUpdateTimer.cancel();
-        textUpdateTimer.purge();
-        loadPicsTimer.cancel();
-        loadPicsTimer.purge();
+        cancelTimer(textUpdateTimer);
+        cancelTimer(loadPicsTimer);
 
         super.onBackPressed();
+    }
+
+    private void cancelTimer(Timer timer) {
+        if (timer != null){
+            timer.cancel();
+            timer.purge();
+        }
     }
 
 

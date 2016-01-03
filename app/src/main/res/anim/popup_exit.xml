@@ -2,6 +2,6 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:shareInterpolator="false" >
     <alpha android:fromAlpha="1.0" android:toAlpha="0.0"
-        android:interpolator="@android:anim/decelerate_interpolator"
-        android:duration="@integer/abc_config_activityShortDur" />
+        android:interpolator="@anim/decelerate_interpolator"
+        android:duration="@integer/longAnimTime" />
 </set>
