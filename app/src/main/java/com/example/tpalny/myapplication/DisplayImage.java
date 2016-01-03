@@ -26,7 +26,6 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     private ImageView im3 = FullscreenSlideshow.imageView3;
     private ImageView im4 = FullscreenSlideshow.imageView4;
     private Drive mGOOSvc = SearchTask.mGOOSvc;
-    private final int animationChangeCounter = 5;
     private Bitmap bm1 = null;
     private Bitmap bm2 = null;
     private Bitmap bm3 = null;
@@ -37,12 +36,16 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     private static final int[] outAnimation = {R.anim.fade_out, R.anim.shrink_fade_out_from_bottom,
             R.anim.popup_exit, R.anim.slide_out_top, R.anim.slide_out_bottom,
             R.anim.slide_out_to_left};
-    private int i = FullscreenSlideshow.i;
+    private final int animationChangeCounter = 5;
 
 
     DisplayImage(Context context) {
         mContext = context;
-
+        mViewFlipper.setInAnimation(mContext, inAnimation[FullscreenSlideshow.i]);
+        mViewFlipper.setOutAnimation(mContext, outAnimation[FullscreenSlideshow.i]);
+        if (currentPic % animationChangeCounter == 0) {
+            FullscreenSlideshow.i = (++FullscreenSlideshow.i) % inAnimation.length;
+        }
     }
 
     @Override
@@ -145,16 +148,12 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap bm) {
-        mViewFlipper.setInAnimation(mContext, inAnimation[i]);
-        mViewFlipper.setOutAnimation(mContext, outAnimation[i]);
-        if (i % animationChangeCounter == 0) {
-            FullscreenSlideshow.i = (++i) % inAnimation.length;
-        }
+
 
 
         if (currentPic == Select_Folders.imagesList.size() || bm == null) {
             //Toast.makeText(mContext, "Finished loading images, num of Images= " + Select_Folders.imagesList.size(), Toast.LENGTH_SHORT).show();
-            FullscreenSlideshow.i = (++i) % inAnimation.length;
+            FullscreenSlideshow.i = (++FullscreenSlideshow.i) % inAnimation.length;
             new SearchTask(mContext, true, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
         } /*else if (bm == null) {
@@ -162,20 +161,20 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
         }*/
         if (currentPic % 4 == 0) {
             im4.setImageBitmap(bm);
-            mViewFlipper.setDisplayedChild(2);
+            mViewFlipper.setDisplayedChild(3);
 
 
         } else if (currentPic % 4 == 1) {
             im1.setImageBitmap(bm);
-            mViewFlipper.setDisplayedChild(3);
+            mViewFlipper.setDisplayedChild(0);
 
         } else if (currentPic % 4 == 2) {
             im2.setImageBitmap(bm);
-            mViewFlipper.setDisplayedChild(0);
+            mViewFlipper.setDisplayedChild(1);
 
         } else if (currentPic % 4 == 3) {
             im3.setImageBitmap(bm);
-            mViewFlipper.setDisplayedChild(1);
+            mViewFlipper.setDisplayedChild(2);
         }
 
         if (currentPic % 4 == 0) {
