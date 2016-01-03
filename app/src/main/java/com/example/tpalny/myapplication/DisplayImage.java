@@ -34,8 +34,12 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     private Bitmap bm2 = null;
     private Bitmap bm3 = null;
     private Bitmap bm4 = null;
-    private static final int[] inAnimation = {R.anim.abc_fade_in, R.anim.abc_grow_fade_in_from_bottom, R.anim.abc_popup_enter, R.anim.abc_slide_in_bottom, R.anim.abc_slide_in_top, R.anim.slide_in_from_right};
-    private static final int[] outAnimation = {R.anim.abc_fade_out, R.anim.abc_shrink_fade_out_from_bottom, R.anim.abc_popup_exit, R.anim.abc_slide_out_top, R.anim.abc_slide_out_bottom, R.anim.slide_out_to_left};
+    private static final int[] inAnimation = {R.anim.fade_in, R.anim.grow_fade_in_from_bottom,
+            R.anim.popup_enter, R.anim.slide_in_bottom, R.anim.slide_in_top,
+            R.anim.slide_in_from_right};
+    private static final int[] outAnimation = {R.anim.fade_out, R.anim.shrink_fade_out_from_bottom,
+            R.anim.popup_exit, R.anim.slide_out_top, R.anim.slide_out_bottom,
+            R.anim.slide_out_to_left};
     private int i = FullscreenSlideshow.i;
 
 
