@@ -154,7 +154,7 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
 
         if (currentPic == Select_Folders.imagesList.size() || bm == null) {
             //Toast.makeText(mContext, "Finished loading images, num of Images= " + Select_Folders.imagesList.size(), Toast.LENGTH_SHORT).show();
-
+            FullscreenSlideshow.i = (++i) % inAnimation.length;
             new SearchTask(mContext, true, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
         } /*else if (bm == null) {
