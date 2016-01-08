@@ -1,6 +1,11 @@
 package com.example.tpalny.myapplication;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.AsyncTask;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.GenericUrl;
@@ -65,7 +70,18 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
+        if (result == null) {
+            FullscreenSlideshow.mText.setVisibility(View.INVISIBLE);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            FullscreenSlideshow.mViewFlipper.setLayoutParams(params);
+            return;
+        }
         FullscreenSlideshow.mText.setText(result);
+        FullscreenSlideshow.mText.setBackgroundColor(Color.WHITE);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ABOVE, FullscreenSlideshow.mText.getId());
+        FullscreenSlideshow.mViewFlipper.setLayoutParams(params);
+
         Integer[] speeds = {500, 450, 400, 350, 300, 250, 200, 150, 100, 75};
         Integer selectedSpeed = Integer.parseInt(Select_Folders.textScrollSpeed.getText().toString()) - 1;
         FullscreenSlideshow.mText.setRndDuration(speeds[selectedSpeed]);

@@ -39,7 +39,9 @@
             android:configChanges="keyboardHidden|screenSize"
             android:label="@string/title_activity_fullscreen_slideshow"
             android:screenOrientation="landscape"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/FullscreenTheme">
+
+        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"

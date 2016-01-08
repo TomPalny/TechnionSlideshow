@@ -68,6 +68,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
 
         if (Select_Folders.isSlideShowWithText) {
             new ReadTextFile().execute();
+
             TimerTask textUpdateTask = new TimerTask() {
                 @Override
                 public void run() {
