@@ -8,8 +8,6 @@
     android:keepScreenOn="true"
     tools:context="com.example.tpalny.myapplication.FullscreenSlideshow">
 
-
-
     <ViewFlipper
         android:id="@+id/flipper"
         android:layout_width="match_parent"
@@ -49,22 +47,22 @@
         android:text="@string/SSDL"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
         android:textColor="#ff836a"
-        android:textStyle="italic"/>
+        android:textStyle="italic" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="80dp"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/cs_logo_small"/>
+        android:src="@drawable/cs_logo_small" />
 
     <TextView
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/SSDL_logo"
         android:background="#627bff"
+        android:paddingBottom="8dp"
         android:paddingStart="8dp"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp"
         android:text="@string/my_name"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
         android:textColor="#ffffff" />
