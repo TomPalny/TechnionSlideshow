@@ -8,6 +8,9 @@
     android:keepScreenOn="true"
     tools:context="com.example.tpalny.myapplication.FullscreenSlideshow">
 
+
+
+
     <ViewFlipper
         android:id="@+id/flipper"
         android:layout_width="match_parent"
@@ -36,6 +39,37 @@
 
     </ViewFlipper>
 
+    <TextView
+        android:id="@+id/SSDL_logo"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="#627bff"
+        android:paddingStart="14dp"
+        android:paddingTop="8dp"
+        android:text="SSDL"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+        android:textColor="#ff836a"
+        android:textStyle="italic"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/cs_logo_small"/>
+
+    <TextView
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/SSDL_logo"
+        android:background="#627bff"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:text="Tom Palny"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
+        android:textColor="#ffffff" />
+
 
     <com.example.tpalny.myapplication.ScrollTextView
         android:id="@+id/my_text"
@@ -43,7 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:textColor="#1a2aff"
-        android:textSize="40sp" />
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Display2" />
 
 
 </RelativeLayout>
