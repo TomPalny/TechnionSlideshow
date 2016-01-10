@@ -4,4 +4,21 @@
     <string name="title_activity_fullscreen_slideshow">FullscreenSlideshow</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="Slideshow">Slideshow</string>
+    <string name="developer_Tom_Palny">Developed by TomPalny @gmail.com</string>
+    <string name="Select_Pics_Folder">Please select the PICTURES folder:</string>
+    <string name="click_to_choose">Click to Choose Folder</string>
+    <string name="clear_selection">Clear Selection</string>
+    <string name="You_selected">You\'ve Selected:</string>
+    <string name="none_selected">None Selected</string>
+    <string name="select_text">Please select the TEXT folder, or leave blank:</string>
+    <string name="pics_duration">Picture Duration on screen (second):</string>
+    <string name="min_pic_duration">5</string>
+    <string name="start_on_boot">Start on boot:</string>
+    <string name="scrolling_speed">Text scroll speed (1-10):</string>
+    <string name="initial_scroll_speed">5</string>
+    <string name="refresh_rate_text">Text files refresh rate (seconds):</string>
+    <string name="initial_refresh_rate">60</string>
+    <string name="SSDL">SSDL</string>
+    <string name="my_name">Tom Palny</string>
 </resources>

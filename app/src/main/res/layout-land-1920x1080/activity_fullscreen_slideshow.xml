@@ -47,7 +47,7 @@
         android:background="#627bff"
         android:paddingStart="14dp"
         android:paddingTop="8dp"
-        android:text="SSDL"
+        android:text="@string/SSDL"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
         android:textColor="#ff836a"
         android:textStyle="italic"/>
@@ -66,7 +66,7 @@
         android:paddingStart="8dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        android:text="Tom Palny"
+        android:text="@string/my_name"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
         android:textColor="#ffffff" />
 

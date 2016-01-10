@@ -16,10 +16,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="20sp"
-            android:drawableLeft="@drawable/google_drive_logo"
             android:drawableStart="@drawable/google_drive_logo"
             android:padding="10dp"
-            android:text="Slideshow"
+            android:text="@string/Slideshow"
             android:textColor="#fa08d4d7"
             android:textSize="60sp"
             android:textStyle="bold"
@@ -31,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Developed by TomPalny @gmail.com"
+            android:text="@string/developer_Tom_Palny"
             android:textColor="#ff9500"
             android:textSize="30sp"
             android:textStyle="italic" />
@@ -47,10 +46,9 @@
                 android:id="@+id/Instructions"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
                 android:layout_marginStart="20dp"
                 android:layout_weight="2"
-                android:text="Please select the PICTURES folder: "
+                android:text="@string/Select_Pics_Folder"
                 android:textColor="#ffffff"
                 android:textSize="30sp"
                 android:textStyle="bold" />
@@ -59,11 +57,10 @@
                 android:layout_width="20dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:layout_marginRight="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/my_button"
                 android:onClick="onPicturesSelectClicked"
-                android:text="Click to Choose Folder"
+                android:text="@string/click_to_choose"
                 android:textSize="20sp" />
         </LinearLayout>
 
@@ -77,10 +74,9 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
                 android:layout_weight="1"
-                android:text="You've Selected: "
+                android:text="@string/You_selected"
                 android:textColor="@android:color/background_light"
                 android:textSize="25sp" />
 
@@ -88,10 +84,9 @@
                 android:id="@+id/Selected_Image_Folder"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
                 android:layout_weight="1"
-                android:text="None Selected"
+                android:text="@string/none_selected"
                 android:textColor="@android:color/background_light"
                 android:textSize="25sp"
                 android:textStyle="italic" />
@@ -100,13 +95,11 @@
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:layout_marginLeft="20sp"
-                android:layout_marginRight="10dp"
                 android:layout_marginStart="20sp"
                 android:layout_weight="1"
                 android:background="@drawable/my_button"
                 android:onClick="onClearPicturesClicked"
-                android:text="Clear Selection"
+                android:text="@string/clear_selection"
                 android:textSize="20sp" />
 
 
@@ -123,10 +116,9 @@
                 android:id="@+id/Instructions2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
                 android:layout_marginStart="15dp"
                 android:layout_weight="2"
-                android:text="Please select the TEXT folder, or leave blank: "
+                android:text="@string/select_text"
                 android:textColor="#ffffff"
                 android:textSize="30sp"
                 android:textStyle="bold" />
@@ -135,11 +127,10 @@
                 android:layout_width="20dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:layout_marginRight="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/my_button"
                 android:onClick="onTextSelectClicked"
-                android:text="Click to Choose Folder"
+                android:text="@string/click_to_choose"
                 android:textSize="20sp" />
         </LinearLayout>
 
@@ -152,10 +143,9 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
                 android:layout_weight="1"
-                android:text="You've Selected: "
+                android:text="@string/You_selected"
                 android:textColor="@android:color/background_light"
                 android:textSize="25sp" />
 
@@ -163,10 +153,9 @@
                 android:id="@+id/Selected_Text_Folder"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
                 android:layout_weight="1"
-                android:text="None Selected"
+                android:text="@string/none_selected"
                 android:textColor="@android:color/background_light"
                 android:textSize="25sp"
                 android:textStyle="italic" />
@@ -175,13 +164,11 @@
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:layout_marginLeft="20sp"
-                android:layout_marginRight="10dp"
                 android:layout_marginStart="20sp"
                 android:layout_weight="1"
                 android:background="@drawable/my_button"
                 android:onClick="onClearTextClicked"
-                android:text="Clear Selection"
+                android:text="@string/clear_selection"
                 android:textSize="20sp" />
 
         </LinearLayout>
@@ -198,9 +185,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
-                android:text="Picture Duration on screen (second):"
+                android:text="@string/pics_duration"
                 android:textColor="@android:color/background_light"
                 android:textSize="25sp" />
 
@@ -208,16 +194,13 @@
                 android:id="@+id/slideshow_delay"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
                 android:inputType="number"
-                android:text="5"
+                android:text="@string/min_pic_duration"
                 android:textColor="#7dfd60"
                 android:textColorHint="#fffafa"
                 android:textSize="25sp"
                 android:textStyle="italic" />
-
-
 
 
         </LinearLayout>
@@ -234,9 +217,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
-                android:text="Start on boot:"
+                android:text="@string/start_on_boot"
                 android:textColor="#ffffff"
                 android:textSize="25sp" />
 
@@ -245,7 +227,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:layout_marginRight="10dp"
                 android:textColor="#ffffff"
                 android:textSize="20sp" />
         </LinearLayout>
@@ -262,10 +243,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
-
-                android:text="Text scroll speed (1-10):"
+                android:text="@string/scrolling_speed"
                 android:textColor="@android:color/background_light"
                 android:textSize="25sp" />
 
@@ -273,10 +252,9 @@
                 android:id="@+id/text_scroll_speed"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
                 android:inputType="number"
-                android:text="5"
+                android:text="@string/initial_scroll_speed"
                 android:textColor="#7dfd60"
                 android:textColorHint="#fffafa"
                 android:textSize="25sp"
@@ -297,9 +275,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
-                android:text="Text files refresh rate (seconds):"
+                android:text="@string/refresh_rate_text"
                 android:textColor="#ffffff"
                 android:textSize="25sp" />
 
@@ -307,11 +284,9 @@
                 android:id="@+id/text_file_refresh_rate"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
-
                 android:inputType="number"
-                android:text="60"
+                android:text="@string/initial_refresh_rate"
                 android:textColor="#7dfd60"
                 android:textColorHint="#fffafa"
                 android:textSize="25sp"
