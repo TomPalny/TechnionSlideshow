@@ -12,10 +12,10 @@
     <string name="You_selected">You\'ve Selected:</string>
     <string name="none_selected">None Selected</string>
     <string name="select_text">Please select the TEXT folder, or leave blank:</string>
-    <string name="pics_duration">Picture Duration on screen (second):</string>
+    <string name="pics_duration">Picture Duration on screen (seconds):</string>
     <string name="min_pic_duration">5</string>
     <string name="start_on_boot">Start on boot:</string>
-    <string name="scrolling_speed">Text scroll speed (1-10):</string>
+    <string name="scrolling_speed">Text scroll speed (1&#8211;10):</string>
     <string name="initial_scroll_speed">5</string>
     <string name="refresh_rate_text">Text files refresh rate (seconds):</string>
     <string name="initial_refresh_rate">60</string>
