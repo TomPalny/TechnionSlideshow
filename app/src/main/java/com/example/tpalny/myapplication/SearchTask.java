@@ -1,9 +1,9 @@
 package com.example.tpalny.myapplication;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -116,8 +116,7 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
         if (mIsImage && Select_Folders.imagesList.size() == 0) {
             Toast.makeText(mContext, "No Image files in folder", Toast.LENGTH_LONG).show();
 
-        }
-        else if (mIsText && Select_Folders.noTextFoundMessageFirstTimeAppearance &&
+        } else if (mIsText && Select_Folders.noTextFoundMessageFirstTimeAppearance &&
                 Select_Folders.textList.size() == 0) {
             Toast.makeText(mContext, "No Text files in folder", Toast.LENGTH_LONG).show();
             Select_Folders.noTextFoundMessageFirstTimeAppearance = false;
@@ -136,16 +135,17 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
                 startActivityForResult((Activity) mContext,
                         ((UserRecoverableAuthIOException) mLastError).getIntent(),
                         Select_Folders.REQUEST_AUTHORIZATION, null);
-            }else{
-
-            new AlertDialog.Builder(mContext)
+            } else {
+                Log.i("SearchTask", "Error Occured " + mLastError.getMessage());
+            /*new AlertDialog.Builder(mContext)
                     .setMessage("The following error occurred:\n"
-                            + mLastError.getMessage()).show();
+                            + mLastError.getMessage()).show();*/
             }
 
         } else {
-            new AlertDialog.Builder(mContext)
-                    .setMessage("Request cancelled.").show();
+            Log.i("SearchTask", "Request cancelled.");
+            /*new AlertDialog.Builder(mContext)
+                    .setMessage("Request cancelled.").show();*/
         }
     }
 }

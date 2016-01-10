@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">G-Drive Slideshow</string>
 
     <string name="title_activity_fullscreen_slideshow">FullscreenSlideshow</string>
     <string name="dummy_button">Dummy Button</string>

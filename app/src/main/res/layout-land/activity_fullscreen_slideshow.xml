@@ -74,7 +74,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Display3"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Display1"
         android:textColor="#1a2aff" />
 
 
