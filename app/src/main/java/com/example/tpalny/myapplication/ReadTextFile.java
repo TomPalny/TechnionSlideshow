@@ -82,7 +82,7 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
         params.addRule(RelativeLayout.ABOVE, FullscreenSlideshow.mText.getId());
         FullscreenSlideshow.mViewFlipper.setLayoutParams(params);
 
-        Integer[] speeds = {550, 500, 450, 400, 350, 300, 250, 200, 150, 100};
+        Integer[] speeds = {900, 850, 750, 650, 550, 450, 375, 300, 250, 200};
         Integer selectedSpeed = Integer.parseInt(Select_Folders.textScrollSpeed.getText().toString()) - 1;
         FullscreenSlideshow.mText.setRndDuration(speeds[selectedSpeed]);
         FullscreenSlideshow.mText.startScroll();

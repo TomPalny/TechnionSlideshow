@@ -503,7 +503,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         String delay = slideShowDelay.getText().toString();
         slideShowButton.setAlpha(.7f);
         if (delay.isEmpty() || Integer.parseInt(delay) < Integer.parseInt(MINIMUM_PIC_DURATION)) {
-            Toast.makeText(this, "Delay should be at least " + MINIMUM_PIC_DURATION + " seconds", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Picture duration should be at least " + MINIMUM_PIC_DURATION + " seconds", Toast.LENGTH_SHORT).show();
             slideShowButton.setAlpha(1);
             return;
         }

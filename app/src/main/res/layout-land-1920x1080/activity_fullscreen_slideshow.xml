@@ -37,15 +37,32 @@
     </ViewFlipper>
 
     <TextView
-        android:id="@+id/SSDL_logo"
-        android:layout_width="80dp"
+        android:id="@+id/my_name"
+        android:layout_width="62dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:background="#627bff"
+        android:paddingBottom="2dp"
+        android:paddingStart="2dp"
+        android:paddingTop="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginStart="2dp"
+        android:text="@string/my_name"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Caption"
+        android:textColor="#ffffff" />
+
+    <TextView
+        android:id="@+id/SSDL_logo"
+        android:layout_width="62dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/my_name"
+        android:background="#627bff"
+        android:paddingBottom="2dp"
         android:paddingStart="14dp"
-        android:paddingTop="8dp"
+        android:paddingTop="2dp"
+        android:layout_marginStart="2dp"
         android:text="@string/SSDL"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
         android:textColor="#ff836a"
         android:textStyle="italic" />
 
@@ -55,25 +72,13 @@
         android:layout_alignParentEnd="true"
         android:src="@drawable/cs_logo_small" />
 
-    <TextView
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/SSDL_logo"
-        android:background="#627bff"
-        android:paddingBottom="8dp"
-        android:paddingStart="8dp"
-        android:paddingTop="8dp"
-        android:text="@string/my_name"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
-        android:textColor="#ffffff" />
-
 
     <com.example.tpalny.myapplication.ScrollTextView
         android:id="@+id/my_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Display2"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Display1"
         android:textColor="#1a2aff" />
 
 
