@@ -78,7 +78,7 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
         }
         FullscreenSlideshow.mText.setText(result);
         FullscreenSlideshow.mText.setBackgroundColor(Color.WHITE);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         params.addRule(RelativeLayout.ABOVE, FullscreenSlideshow.mText.getId());
         FullscreenSlideshow.mViewFlipper.setLayoutParams(params);
 

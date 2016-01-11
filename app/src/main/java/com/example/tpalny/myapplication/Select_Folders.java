@@ -56,6 +56,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     protected static final String SCROLLING_SPEED = "scrolling_speed";
     protected static final String REFRESH_RATE = "refresh_rate";
     private static final String PREF_ACCOUNT_NAME = "accountName";
+    private static final String MINIMUM_PIC_DURATION = "10";
     private final String PICTURES_FOLDER_TAG = "pictures_folder";
     private final String TEXT_FOLDER_TAG = "text_folder";
     private final String DELAY_TAG = "delay";
@@ -235,7 +236,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         }
 
 
-        String delay = settings.getString(DELAY_TAG, "5");
+        String delay = settings.getString(DELAY_TAG, MINIMUM_PIC_DURATION);
         slideShowDelay.setText(delay);
         String scrollingSpeed = settings.getString(SCROLLING_SPEED, "5");
         textScrollSpeed.setText(scrollingSpeed);
@@ -501,8 +502,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     public void onPlaySlideshowClicked(View view) {
         String delay = slideShowDelay.getText().toString();
         slideShowButton.setAlpha(.7f);
-        if (delay.isEmpty() || Integer.parseInt(delay) < 5) {
-            Toast.makeText(this, "Delay should be at least 5 seconds", Toast.LENGTH_SHORT).show();
+        if (delay.isEmpty() || Integer.parseInt(delay) < Integer.parseInt(MINIMUM_PIC_DURATION)) {
+            Toast.makeText(this, "Delay should be at least " + MINIMUM_PIC_DURATION + " seconds", Toast.LENGTH_SHORT).show();
             slideShowButton.setAlpha(1);
             return;
         }
