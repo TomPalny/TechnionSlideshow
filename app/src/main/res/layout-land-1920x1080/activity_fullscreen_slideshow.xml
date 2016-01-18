@@ -38,7 +38,7 @@
 
     <TextView
         android:id="@+id/my_name"
-        android:layout_width="62dp"
+        android:layout_width="64dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:background="#627bff"
@@ -53,7 +53,7 @@
 
     <TextView
         android:id="@+id/SSDL_logo"
-        android:layout_width="62dp"
+        android:layout_width="64dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/my_name"
         android:background="#627bff"
