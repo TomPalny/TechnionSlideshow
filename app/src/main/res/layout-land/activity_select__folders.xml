@@ -301,6 +301,39 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingEnd="10sp"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
+            android:paddingStart="10sp">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:text="@string/delay_start_after_boot"
+                android:textColor="#ffffff"
+                android:textSize="25sp" />
+
+            <EditText
+                android:id="@+id/delay_after_boot"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:inputType="number"
+                android:text="@string/initial_boot_delay"
+                android:textColor="#7dfd60"
+                android:textColorHint="#fffafa"
+                android:textSize="25sp"
+                android:textStyle="italic" />
+
+
+        </LinearLayout>
+
         <Button
             android:id="@+id/Start_Slideshow_Button"
             android:layout_width="70dp"
