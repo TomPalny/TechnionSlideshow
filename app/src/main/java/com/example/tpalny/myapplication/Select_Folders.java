@@ -249,11 +249,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         textFileRefreshRate.setText(refreshRate);
         String dealyStart = settings.getString(DELAY_START, "1");
         delayAfterBoot.setText(dealyStart);
-        toggle.setChecked(settings.getString(START_ON_BOOT, "").
-
-                        equals("true")
-
-        );
+        toggle.setChecked(settings.getString(START_ON_BOOT, "").equals("true"));
 
         if (!userCancelledSlideshow) {
             showToast(delayString);
@@ -528,7 +524,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         editor.putString(DELAY_TAG, delay).apply();
         editor.putString(SCROLLING_SPEED, scrollingSpeed).apply();
         editor.putString(REFRESH_RATE, refreshRate).apply();
-        editor.putString(DELAY_START,delayStart);
+        editor.putString(DELAY_START, delayStart);
         editor.putBoolean(USER_CANCELLED_SLIDESHOW, false).apply();
         Intent intent = new Intent(this, FullscreenSlideshow.class);
         startActivity(intent);
