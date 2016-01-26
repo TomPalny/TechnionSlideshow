@@ -21,6 +21,6 @@
     <string name="initial_refresh_rate">5</string>
     <string name="SSDL">SSDL</string>
     <string name="my_name">Tom Palny</string>
-    <string name="delay_start_after_boot">Delay slideshow start after boot (minutes):</string>
-    <string name="initial_boot_delay">1</string>
+    <string name="delay_start_after_boot">Delay slideshow start after boot (seconds):</string>
+    <string name="initial_boot_delay">20</string>
 </resources>

@@ -57,7 +57,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     protected static final String REFRESH_RATE = "refresh_rate";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String MINIMUM_PIC_DURATION = "10";
-    private static final String DELAY_START = "5";
+    private static final String DELAY_START = "20";
     private final String PICTURES_FOLDER_TAG = "pictures_folder";
     private final String TEXT_FOLDER_TAG = "text_folder";
     private final String DELAY_TAG = "delay";
@@ -235,7 +235,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         String delayString = delayAfterBoot.getText().toString();
         Integer delayInt = Integer.parseInt(delayString);
         if (!userCancelledSlideshow) {
-            slowNetworkTimer.schedule(slowNetworkTask, delayInt * 60000);
+            slowNetworkTimer.schedule(slowNetworkTask, delayInt * 1000);
         } else {
             slowNetworkTimer.schedule(slowNetworkTask, 500);
         }
@@ -247,7 +247,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         textScrollSpeed.setText(scrollingSpeed);
         String refreshRate = settings.getString(REFRESH_RATE, "5");
         textFileRefreshRate.setText(refreshRate);
-        String dealyStart = settings.getString(DELAY_START, "1");
+        String dealyStart = settings.getString(DELAY_START, "20");
         delayAfterBoot.setText(dealyStart);
         toggle.setChecked(settings.getString(START_ON_BOOT, "").equals("true"));
 
@@ -262,7 +262,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             };
             Timer timer = new Timer();
             //delaying the start of the slideshow by the amount of minutes + 10 seconds
-            timer.schedule(tt, (delayInt * 60000) + (10 * 1000));
+            timer.schedule(tt, (delayInt * 1000) + (10 * 1000));
         }
     }
 
@@ -279,7 +279,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         tv.setGravity(Gravity.CENTER);
 
         // set the text you want to show in  Toast
-        tv.setText("The Slideshow will start in " + delay + " minutes...");
+        tv.setText("The Slideshow will start in " + delay + " seconds...");
 
         ImageView img = new ImageView(this);
 
