@@ -6,13 +6,14 @@
     android:layout_height="match_parent"
     android:background="#ffffff"
     android:keepScreenOn="true"
+    android:onClick="onImageClicked"
     tools:context="com.example.tpalny.myapplication.FullscreenSlideshow">
 
     <ViewFlipper
         android:id="@+id/flipper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:onClick="onImageClicked">
+        >
 
         <ImageView
             android:id="@+id/im1"

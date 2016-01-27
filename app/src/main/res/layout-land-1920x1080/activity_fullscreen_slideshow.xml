@@ -6,13 +6,13 @@
     android:layout_height="match_parent"
     android:background="#ffffff"
     android:keepScreenOn="true"
+    android:onClick="onImageClicked"
     tools:context="com.example.tpalny.myapplication.FullscreenSlideshow">
 
     <ViewFlipper
         android:id="@+id/flipper"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:onClick="onImageClicked">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/im1"
@@ -41,12 +41,12 @@
         android:layout_width="64dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
         android:background="#627bff"
         android:paddingBottom="2dp"
         android:paddingStart="2dp"
         android:paddingTop="2dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginStart="2dp"
         android:text="@string/my_name"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Caption"
         android:textColor="#ffffff" />
@@ -56,11 +56,11 @@
         android:layout_width="64dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/my_name"
+        android:layout_marginStart="2dp"
         android:background="#627bff"
         android:paddingBottom="2dp"
         android:paddingStart="14dp"
         android:paddingTop="2dp"
-        android:layout_marginStart="2dp"
         android:text="@string/SSDL"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
         android:textColor="#ff836a"

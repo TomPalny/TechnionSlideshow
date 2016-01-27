@@ -108,7 +108,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         textFileRefreshRate = (EditText) findViewById(R.id.text_file_refresh_rate);
         delayAfterBoot = (EditText) findViewById(R.id.delay_after_boot);
         noTextFoundMessageFirstTimeAppearance = true;
-        loadPicsTimer = new Timer();
+        //loadPicsTimer = new Timer();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(com.google.android.gms.drive.Drive.API)
                 .addScope(com.google.android.gms.drive.Drive.SCOPE_FILE)
@@ -149,7 +149,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     protected void onResume() {
         super.onResume();
         DisplayImage.currentPic = 0;
-        loadPicsTimer.cancel();
+        //loadPicsTimer.cancel();
         if (isGoogleAvailable()) {
             refreshResults();
         } else {
