@@ -23,4 +23,6 @@
     <string name="my_name">Tom Palny</string>
     <string name="delay_start_after_boot">Delay slideshow start after boot (seconds):</string>
     <string name="initial_boot_delay">20</string>
+    <string name="change_account">Change Drive Account:</string>
+    <string name="switch_account_button">Switch Account</string>
 </resources>
