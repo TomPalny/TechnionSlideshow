@@ -57,7 +57,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     protected static final String REFRESH_RATE = "refresh_rate";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String MINIMUM_PIC_DURATION = "10";
-    private static final String DELAY_START = "20";
+    private static final String DELAY_START = "delay_start";
     private final String PICTURES_FOLDER_TAG = "pictures_folder";
     private final String TEXT_FOLDER_TAG = "text_folder";
     private final String DELAY_TAG = "delay";
@@ -178,8 +178,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                         .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
                             @Override
                             public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
-                                picturesFolderName = settings.getString(PICS_FOLDER_NAME_TAG, "");
-                                pictureSelectionText.setText(picturesFolderName);
+
                                 picturesFolderID = picsDriveId.getResourceId();
                                 slideShowButton.setEnabled(true);
                                 slideShowButton.setAlpha(1);
@@ -208,8 +207,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                             .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
                                 @Override
                                 public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
-                                    textFolderName = settings.getString(TEXT_FOLDER_NAME_TAG, "");
-                                    textSelectionText.setText(textFolderName);
+
                                     textFolderID = textDriveId.getResourceId();
                                     if (isDeviceOnline()) {
                                         new SearchTask(Select_Folders.this, false, true)
@@ -230,7 +228,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
         Boolean userCancelledSlideshow = settings.getBoolean(USER_CANCELLED_SLIDESHOW, true);
         //this is the case of a restart after device rebooted during slideshow
-        String delayString = delayAfterBoot.getText().toString();
+        String delayString = settings.getString(DELAY_START, "20");
+        delayAfterBoot.setText(delayString);
         Integer delayInt = Integer.parseInt(delayString);
         if (!userCancelledSlideshow) {
             slowNetworkTimer.schedule(slowNetworkTask, delayInt * 1000);
@@ -238,15 +237,16 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             slowNetworkTimer.schedule(slowNetworkTask, 500);
         }
 
-
+        picturesFolderName = settings.getString(PICS_FOLDER_NAME_TAG, "");
+        pictureSelectionText.setText(picturesFolderName);
+        textFolderName = settings.getString(TEXT_FOLDER_NAME_TAG, "");
+        textSelectionText.setText(textFolderName);
         String delay = settings.getString(DELAY_TAG, MINIMUM_PIC_DURATION);
         slideShowDelay.setText(delay);
         String scrollingSpeed = settings.getString(SCROLLING_SPEED, "5");
         textScrollSpeed.setText(scrollingSpeed);
         String refreshRate = settings.getString(REFRESH_RATE, "5");
         textFileRefreshRate.setText(refreshRate);
-        String dealyStart = settings.getString(DELAY_START, "20");
-        delayAfterBoot.setText(dealyStart);
         toggle.setChecked(settings.getString(START_ON_BOOT, "").equals("true"));
 
         if (!userCancelledSlideshow) {
@@ -259,8 +259,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 }
             };
             Timer timer = new Timer();
-            //delaying the start of the slideshow by the amount of minutes + 10 seconds
-            timer.schedule(tt, (delayInt * 1000) + (10 * 1000));
+            //delaying the start of the slideshow by the amount of minutes + 5 seconds
+            timer.schedule(tt, (delayInt * 1000) + (5 * 1000));
         }
     }
 
@@ -277,7 +277,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         tv.setGravity(Gravity.CENTER);
 
         // set the text you want to show in  Toast
-        tv.setText("The Slideshow will start in " + delay + " seconds...");
+        tv.setText(String.format("The Slideshow will start in %s seconds...", delay));
 
         ImageView img = new ImageView(this);
 
@@ -522,7 +522,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         editor.putString(DELAY_TAG, delay).apply();
         editor.putString(SCROLLING_SPEED, scrollingSpeed).apply();
         editor.putString(REFRESH_RATE, refreshRate).apply();
-        editor.putString(DELAY_START, delayStart);
+        editor.putString(DELAY_START, delayStart).apply();
         editor.putBoolean(USER_CANCELLED_SLIDESHOW, false).apply();
         Intent intent = new Intent(this, FullscreenSlideshow.class);
         startActivity(intent);
@@ -559,8 +559,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     }
 
     public void onSwitchAccountClicked(View view) {
-        onClearPicturesClicked(null);
-        onClearTextClicked(null);
         mGoogleApiClient.clearDefaultAccountAndReconnect();
         startActivityForResult(
                 mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
