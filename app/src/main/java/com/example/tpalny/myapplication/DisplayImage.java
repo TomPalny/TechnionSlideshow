@@ -36,14 +36,14 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     private static final int[] outAnimation = {R.anim.fade_out, R.anim.shrink_fade_out_from_bottom,
             R.anim.popup_exit, R.anim.slide_out_top, R.anim.slide_out_bottom,
             R.anim.slide_out_to_left};
-    private final int animationChangeCounter = 5;
+    /*private final int animationChangeCounter = 5;*/
 
 
     DisplayImage(Context context) {
         mContext = context;
         mViewFlipper.setInAnimation(mContext, inAnimation[FullscreenSlideshow.i]);
         mViewFlipper.setOutAnimation(mContext, outAnimation[FullscreenSlideshow.i]);
-        if (currentPic % animationChangeCounter == 0) {
+        if (currentPic % inAnimation.length == 0) {
             FullscreenSlideshow.i = (++FullscreenSlideshow.i) % inAnimation.length;
         }
     }
