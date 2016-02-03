@@ -88,6 +88,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private ToggleButton toggle;
     protected static boolean isSlideShowWithText = false;
     protected static Boolean noTextFoundMessageFirstTimeAppearance;
+    //protected static Boolean userCanceledSlideshow = true;
 
     private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
     private EditText delayAfterBoot;

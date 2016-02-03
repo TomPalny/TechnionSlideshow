@@ -88,7 +88,6 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
             options.inJustDecodeBounds = false;
             Bitmap bm = null;
 
-
             while (bm == null) {
                 options.inSampleSize = inSampleSize;
 
@@ -149,10 +148,7 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bm) {
 
-
-
         if (currentPic == Select_Folders.imagesList.size() || bm == null) {
-            //Toast.makeText(mContext, "Finished loading images, num of Images= " + Select_Folders.imagesList.size(), Toast.LENGTH_SHORT).show();
             FullscreenSlideshow.i = (++FullscreenSlideshow.i) % inAnimation.length;
             new SearchTask(mContext, true, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
@@ -162,7 +158,6 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap> {
         if (currentPic % 4 == 0) {
             im4.setImageBitmap(bm);
             mViewFlipper.setDisplayedChild(3);
-
 
         } else if (currentPic % 4 == 1) {
             im1.setImageBitmap(bm);
