@@ -54,13 +54,13 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private static final String TEXT_DRIVEID = "text_driveID";
     protected static final String USER_CANCELLED_SLIDESHOW = "user_cancelled_slideshow";
     protected static final String SCROLLING_SPEED = "scrolling_speed";
-    protected static final String REFRESH_RATE = "refresh_rate";
+    protected static final String TEXT_REFRESH_RATE = "refresh_rate";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String MINIMUM_PIC_DURATION = "10";
     private static final String DELAY_START = "delay_start";
     private final String PICTURES_FOLDER_TAG = "pictures_folder";
     private final String TEXT_FOLDER_TAG = "text_folder";
-    private final String DELAY_TAG = "delay";
+    private final String PIC_DURATION = "pic_duration";
     private static final int REQUEST_CODE_IMAGE_OPENER = 1;
     private static final int REQUEST_CODE_TEXT_OPENER = 2;
     static final int REQUEST_ACCOUNT_PICKER = 1000;
@@ -241,11 +241,11 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         pictureSelectionText.setText(picturesFolderName);
         textFolderName = settings.getString(TEXT_FOLDER_NAME_TAG, "");
         textSelectionText.setText(textFolderName);
-        String delay = settings.getString(DELAY_TAG, MINIMUM_PIC_DURATION);
+        String delay = settings.getString(PIC_DURATION, MINIMUM_PIC_DURATION);
         slideShowDelay.setText(delay);
         String scrollingSpeed = settings.getString(SCROLLING_SPEED, "5");
         textScrollSpeed.setText(scrollingSpeed);
-        String refreshRate = settings.getString(REFRESH_RATE, "5");
+        String refreshRate = settings.getString(TEXT_REFRESH_RATE, "60");
         textFileRefreshRate.setText(refreshRate);
         toggle.setChecked(settings.getString(START_ON_BOOT, "").equals("true"));
 
@@ -519,9 +519,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         String refreshRate = textFileRefreshRate.getText().toString();
         String delayStart = delayAfterBoot.getText().toString();
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString(DELAY_TAG, delay).apply();
+        editor.putString(PIC_DURATION, delay).apply();
         editor.putString(SCROLLING_SPEED, scrollingSpeed).apply();
-        editor.putString(REFRESH_RATE, refreshRate).apply();
+        editor.putString(TEXT_REFRESH_RATE, refreshRate).apply();
         editor.putString(DELAY_START, delayStart).apply();
         editor.putBoolean(USER_CANCELLED_SLIDESHOW, false).apply();
         Intent intent = new Intent(this, FullscreenSlideshow.class);

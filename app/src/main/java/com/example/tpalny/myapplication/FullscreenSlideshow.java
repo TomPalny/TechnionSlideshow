@@ -6,7 +6,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ViewFlipper;
@@ -57,7 +60,13 @@ public class FullscreenSlideshow extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         heightPixels = metrics.heightPixels;
         widthPixels = metrics.widthPixels;
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        //checking if the device has navigation bar at the bottom before hiding it
+        //boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+        boolean hasMenuKey = ViewConfiguration.get(this).hasPermanentMenuKey();
+        if (!hasMenuKey) {
+            // Do whatever you need to do, this device has a navigation bar
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
     }
 
 
@@ -160,7 +169,9 @@ public class FullscreenSlideshow extends AppCompatActivity {
     }
 
     private void cancelTimer() {
-        textUpdateHandle.cancel(true);
+        if (textUpdateHandle != null) {
+            textUpdateHandle.cancel(true);
+        }
         pictureDisplayHandle.cancel(true);
         /*if (timer != null){
             timer.cancel();
