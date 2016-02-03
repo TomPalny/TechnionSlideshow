@@ -235,7 +235,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         if (!userCancelledSlideshow) {
             slowNetworkTimer.schedule(slowNetworkTask, delayInt * 1000);
         } else {
-            slowNetworkTimer.schedule(slowNetworkTask, 500);
+            slowNetworkTimer.schedule(slowNetworkTask, 0);
         }
 
         picturesFolderName = settings.getString(PICS_FOLDER_NAME_TAG, "");

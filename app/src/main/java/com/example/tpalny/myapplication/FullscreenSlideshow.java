@@ -150,8 +150,6 @@ public class FullscreenSlideshow extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean(Select_Folders.USER_CANCELLED_SLIDESHOW, true).apply();
         cancelTimer();
         clearMem();
         unbindDrawables(findViewById(R.id.root_view));
