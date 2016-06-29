@@ -45,6 +45,12 @@
             android:textSize="30sp"
             android:textStyle="italic" />
 
+        <!--<ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/download_progress"
+            android:layout_gravity="center"/>-->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -303,6 +309,39 @@
                 android:textColorHint="#fffafa"
                 android:textSize="25sp"
                 android:textStyle="italic" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingEnd="10sp"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
+            android:paddingStart="10sp">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:text="@string/picture_files_update_rate_minutes"
+                android:textColor="#ffffff"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/picture_file_refresh_rate"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:inputType="number"
+                android:text="@string/initial_refresh_rate"
+                android:textColor="#7dfd60"
+                android:textColorHint="#fffafa"
+                android:textSize="25sp"
+                android:textStyle="italic" />
+
 
         </LinearLayout>
 

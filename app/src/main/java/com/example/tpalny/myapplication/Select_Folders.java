@@ -2,13 +2,18 @@ package com.example.tpalny.myapplication;
 
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -33,14 +38,24 @@ import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResource;
 import com.google.android.gms.drive.OpenFileActivityBuilder;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpResponse;
 import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static android.os.Environment.MEDIA_MOUNTED;
+import static android.os.Environment.getExternalStorageState;
 
 
 public class Select_Folders extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
@@ -54,10 +69,11 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     private static final String TEXT_DRIVEID = "text_driveID";
     protected static final String USER_CANCELLED_SLIDESHOW = "user_cancelled_slideshow";
     protected static final String SCROLLING_SPEED = "scrolling_speed";
-    protected static final String TEXT_REFRESH_RATE = "refresh_rate";
+    protected static final String TEXT_REFRESH_RATE = "text_refresh_rate";
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String MINIMUM_PIC_DURATION = "10";
+    private static final String MINIMUM_PIC_DURATION = "4";
     private static final String DELAY_START = "delay_start";
+    private static final String PICS_REFRESH_RATE = "pics_refresh_rate";
     private final String PICTURES_FOLDER_TAG = "pictures_folder";
     private final String TEXT_FOLDER_TAG = "text_folder";
     private final String PIC_DURATION = "pic_duration";
@@ -82,6 +98,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     protected static EditText slideShowDelay;
     protected static EditText textScrollSpeed;
     protected static EditText textFileRefreshRate;
+    protected static EditText pictureFileRefreshRate;
     private static SharedPreferences settings;
     protected static String textFolderID = null;
     private String textFolderName = null;
@@ -92,6 +109,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
     private static final String[] SCOPES = {DriveScopes.DRIVE_READONLY};
     private EditText delayAfterBoot;
+    protected static String root;
+    protected static java.io.File myDir;
+    protected static ProgressDialog mProgressDialog;
 
 
     @Override
@@ -106,8 +126,13 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         slideShowDelay = (EditText) findViewById(R.id.slideshow_delay);
         textScrollSpeed = (EditText) findViewById(R.id.text_scroll_speed);
         textFileRefreshRate = (EditText) findViewById(R.id.text_file_refresh_rate);
+        pictureFileRefreshRate = (EditText) findViewById(R.id.picture_file_refresh_rate);
         delayAfterBoot = (EditText) findViewById(R.id.delay_after_boot);
         noTextFoundMessageFirstTimeAppearance = true;
+        root = getExternalFilesDir(null).toString();
+        myDir = new java.io.File(root + "/saved_images");
+        myDir.mkdirs();
+
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(com.google.android.gms.drive.Drive.API)
@@ -145,6 +170,126 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     }
 
 
+    public static class DownloadTask extends AsyncTask<Void, Integer, Void> {
+        private Drive mGOOSvc = SearchTask.mGOOSvc;
+        private Context mContext;
+        int mListSize;
+        Boolean showProgress;
+        //this is the number of times download is called before old pics in local storage are
+        // checked against the cloud storage in order to delete obsolete local files
+        static int deleteFilesCounter = 0;
+
+        DownloadTask(Context context, int listSize, boolean showProgressFlag) {
+            deleteFilesCounter++;
+            mContext = context;
+            mListSize = listSize;
+            showProgress = showProgressFlag;
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (!getExternalStorageState().equals(MEDIA_MOUNTED)) {
+                cancel(true);
+            }
+            if (showProgress) {
+                mProgressDialog = new ProgressDialog(mContext);
+                mProgressDialog.setMax(mListSize);
+                mProgressDialog.setMessage("Downloading files...");
+                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.show();
+            }
+
+            if (deleteFilesCounter == 2) {
+                deleteFilesCounter = 0;
+                java.io.File[] files = myDir.listFiles();
+                for (int i = 0; i < files.length; i++) {
+                    boolean obsolete = true;
+                    for (int j = 0; j < imagesList.size(); j++) {
+                        if (files[i].getName().equals(imagesList.get(j).getId() + ".jpg")) {
+                            obsolete = false;
+                        }
+                    }
+                    if (obsolete) {
+                        files[i].delete();
+                        files = myDir.listFiles();
+                        i = 0;
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            HttpResponse resp = null;
+            InputStream is = null;
+            Integer count = 1;
+
+            for (int currentPic = 0; currentPic < mListSize; currentPic++) {
+                try {
+                    GenericUrl url = new GenericUrl(imagesList
+                            .get(currentPic).getDownloadUrl());
+                    String fname = imagesList.get(currentPic).getId() + ".jpg";
+                    java.io.File file = new java.io.File(myDir, fname);
+                    if (file.exists()) continue;
+
+
+                    resp = mGOOSvc.getRequestFactory().buildGetRequest(url).execute();
+                    is = resp.getContent();
+
+                    Bitmap bm = BitmapFactory.decodeStream(is);
+                    FileOutputStream out = new FileOutputStream(file);
+                    bm.compress(Bitmap.CompressFormat.JPEG, 95, out);
+                    if (showProgress) publishProgress(count++);
+                    out.flush();
+                    out.close();
+
+
+                } catch (IOException e) {
+                    // An error occurred.
+                    e.printStackTrace();
+                } finally {
+                    if (is != null) {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (resp != null) {
+                        try {
+                            resp.disconnect();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+            return null;
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+            mProgressDialog.setProgress(progress[0]);
+        }
+
+        @Override
+        protected void onCancelled() {
+            Log.e("MOUNT ERROR", "Check External Storage!");
+            super.onCancelled();
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (showProgress) mProgressDialog.dismiss();
+            super.onPostExecute(aVoid);
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -169,89 +314,41 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             return;
         }
 
-        final DriveId picsDriveId = DriveId.decodeFromString(driveIdDecode);
-        final DriveFolder picsDriveFolder = picsDriveId.asDriveFolder();
+        picturesFolderID = settings.getString(PICTURES_FOLDER_TAG, "");
+        textFolderID = settings.getString(TEXT_FOLDER_TAG, "");
 
-        TimerTask slowNetworkTask = new TimerTask() {
-            @Override
-            public void run() {
-                picsDriveFolder.getMetadata(mGoogleApiClient)
-                        .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
-                            @Override
-                            public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
+        if(!textFolderID.equals("")) isSlideShowWithText = true;
 
-                                picturesFolderID = picsDriveId.getResourceId();
-                                slideShowButton.setEnabled(true);
-                                slideShowButton.setAlpha(1);
-                                if (isDeviceOnline()) {
-                                    new SearchTask(Select_Folders.this, true, false)
-                                            .execute();
-
-                                } else {
-                                    Toast.makeText(Select_Folders.this,
-                                            "No network connection available, attempting again in 10 seconds, please be patient...",
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-
-                textFolderID = settings.getString(TEXT_FOLDER_TAG, "");
-                if (!textFolderID.isEmpty()) {
-                    String driveIdDecode = settings.getString(TEXT_DRIVEID, "");
-                    if (driveIdDecode.isEmpty()) {
-                        return;
-                    }
-                    isSlideShowWithText = true;
-                    final DriveId textDriveId = DriveId.decodeFromString(driveIdDecode);
-                    final DriveFolder textDriveFolder = textDriveId.asDriveFolder();
-                    textDriveFolder.getMetadata(mGoogleApiClient)
-                            .setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
-                                @Override
-                                public void onResult(@NonNull DriveResource.MetadataResult metadataResult) {
-
-                                    textFolderID = textDriveId.getResourceId();
-                                    if (isDeviceOnline()) {
-                                        new SearchTask(Select_Folders.this, false, true)
-                                                .execute();
-
-                                    } else {
-                                        Toast.makeText(Select_Folders.this,
-                                                "No network connection available, attempting again in 10 seconds, please be patient...",
-                                                Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            });
-
-                }
-            }
-        };
-        Timer slowNetworkTimer = new Timer();
 
         Boolean userCancelledSlideshow = settings.getBoolean(USER_CANCELLED_SLIDESHOW, true);
         //this is the case of a restart after device rebooted during slideshow
         String delayString = settings.getString(DELAY_START, "20");
         delayAfterBoot.setText(delayString);
         Integer delayInt = Integer.parseInt(delayString);
-        if (!userCancelledSlideshow) {
+        /*if (!userCancelledSlideshow) {
             slowNetworkTimer.schedule(slowNetworkTask, delayInt * 1000);
         } else {
             slowNetworkTimer.schedule(slowNetworkTask, 0);
-        }
+        }*/
 
         picturesFolderName = settings.getString(PICS_FOLDER_NAME_TAG, "");
         pictureSelectionText.setText(picturesFolderName);
+        slideShowButton.setAlpha(1);
+        slideShowButton.setEnabled(true);
         textFolderName = settings.getString(TEXT_FOLDER_NAME_TAG, "");
         textSelectionText.setText(textFolderName);
         String delay = settings.getString(PIC_DURATION, MINIMUM_PIC_DURATION);
         slideShowDelay.setText(delay);
         String scrollingSpeed = settings.getString(SCROLLING_SPEED, "5");
         textScrollSpeed.setText(scrollingSpeed);
-        String refreshRate = settings.getString(TEXT_REFRESH_RATE, "60");
-        textFileRefreshRate.setText(refreshRate);
+        String picsRefreshRate = settings.getString(PICS_REFRESH_RATE, "60");
+        pictureFileRefreshRate.setText(picsRefreshRate);
+        String textRefreshRate = settings.getString(TEXT_REFRESH_RATE, "60");
+        textFileRefreshRate.setText(textRefreshRate);
         toggle.setChecked(settings.getString(START_ON_BOOT, "").equals("true"));
 
         if (!userCancelledSlideshow) {
-            showToast(delayString);
+            showToast(Integer.parseInt(delayString));
             final Intent intent = new Intent(this, FullscreenSlideshow.class);
             TimerTask tt = new TimerTask() {
                 @Override
@@ -260,13 +357,35 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 }
             };
             Timer timer = new Timer();
-            //delaying the start of the slideshow by the amount of minutes + 5 seconds
-            timer.schedule(tt, (delayInt * 1000) + (5 * 1000));
+            //delaying the start of the slideshow by the amount of seconds
+            timer.schedule(tt, (delayInt * 1000 + 1000));
         }
     }
 
-    private void showToast(String delay) {
-        LinearLayout layout = new LinearLayout(this);
+    private void showToast(Integer delay) {
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setMax(delay);
+        mProgressDialog.setMessage("The slideshow will begin in "+delay +" seconds");
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setIndeterminate(false);
+        mProgressDialog.show();
+
+        new CountDownTimer(delay*1000, 10){
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                mProgressDialog.setProgress((int)(millisUntilFinished/1000));
+            }
+
+            @Override
+            public void onFinish() {
+                mProgressDialog.dismiss();
+
+            }
+        }.start();
+
+
+        /*LinearLayout layout = new LinearLayout(this);
         layout.setBackgroundResource(R.color.myBackground);
 
         TextView tv = new TextView(this);
@@ -298,7 +417,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         toast.setDuration(Toast.LENGTH_LONG);
         for (int x = 0; x < 4; x++) {
             toast.show();
-        }
+        }*/
     }
 
     private void refreshResults() {
@@ -418,7 +537,9 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                                         .execute();
                             } else {
                                 new AlertDialog.Builder(Select_Folders.this)
-                                        .setMessage("No network connection available.").show();
+                                        .setMessage("No network connection available. " +
+                                                "Make sure you are connected to the internet and try again...").show();
+
                             }
 
                         } else if (isTextCase) {
@@ -433,7 +554,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
                             } else {
                                 new AlertDialog.Builder(Select_Folders.this)
-                                        .setMessage("No network connection available.").show();
+                                        .setMessage("No network connection available. " +
+                                                "Make sure you are connected to the internet and try again...").show();
                             }
                         }
                     }
@@ -492,6 +614,12 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(PICS_FOLDER_NAME_TAG, "").apply();
         editor.putString(PICTURES_FOLDER_TAG, "").apply();
+        java.io.File[] files = myDir.listFiles();
+        while (files.length > 0) {
+            files[0].delete();
+            files = myDir.listFiles();
+        }
+
     }
 
     public void onClearTextClicked(View view) {
@@ -517,12 +645,14 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             slideShowButton.setAlpha(1);
             return;
         }
-        String refreshRate = textFileRefreshRate.getText().toString();
+        String picsRefreshRate = pictureFileRefreshRate.getText().toString();
+        String textRefreshRate = textFileRefreshRate.getText().toString();
         String delayStart = delayAfterBoot.getText().toString();
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(PIC_DURATION, delay).apply();
         editor.putString(SCROLLING_SPEED, scrollingSpeed).apply();
-        editor.putString(TEXT_REFRESH_RATE, refreshRate).apply();
+        editor.putString(PICS_REFRESH_RATE, picsRefreshRate).apply();
+        editor.putString(TEXT_REFRESH_RATE, textRefreshRate).apply();
         editor.putString(DELAY_START, delayStart).apply();
         editor.putBoolean(USER_CANCELLED_SLIDESHOW, false).apply();
         Intent intent = new Intent(this, FullscreenSlideshow.class);
@@ -538,7 +668,6 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     public void onConnectionSuspended(int i) {
 
     }
-
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult result) {

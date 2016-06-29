@@ -77,14 +77,15 @@ public class ReadTextFile extends AsyncTask<Void, Void, String> {
             return;
         }
         FullscreenSlideshow.mText.setText(result);
-        FullscreenSlideshow.mText.setBackgroundColor(Color.WHITE);
+        FullscreenSlideshow.mText.setText(result);
+        FullscreenSlideshow.mText.setSelected(true);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         params.addRule(RelativeLayout.ABOVE, FullscreenSlideshow.mText.getId());
         FullscreenSlideshow.mViewFlipper.setLayoutParams(params);
 
-        Integer[] speeds = {900, 850, 750, 650, 550, 450, 375, 300, 250, 200};
+        /*Integer[] speeds = {900, 850, 750, 650, 550, 450, 375, 300, 250, 200};
         Integer selectedSpeed = Integer.parseInt(Select_Folders.textScrollSpeed.getText().toString()) - 1;
         FullscreenSlideshow.mText.setRndDuration(speeds[selectedSpeed]);
-        FullscreenSlideshow.mText.startScroll();
+        FullscreenSlideshow.mText.startScroll();*/
     }
 }

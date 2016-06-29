@@ -5,7 +5,7 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="Slideshow">Slideshow</string>
-    <string name="developer_Tom_Palny">Developed by TomPalny @gmail.com</string>
+    <string name="developer_Tom_Palny">Developed by TomPalny@gmail.com</string>
     <string name="Select_Pics_Folder">Please select the PICTURES folder:</string>
     <string name="click_to_choose">Click to Choose Folder</string>
     <string name="clear_selection">Clear Selection</string>
@@ -17,7 +17,7 @@
     <string name="start_on_boot">Start on boot:</string>
     <string name="scrolling_speed">Text scroll speed (1&#8211;10):</string>
     <string name="initial_scroll_speed">5</string>
-    <string name="refresh_rate_text">Text files refresh rate (minutes):</string>
+    <string name="refresh_rate_text">Text files update rate (minutes):</string>
     <string name="initial_refresh_rate">60</string>
     <string name="SSDL">SSDL</string>
     <string name="my_name">Tom Palny</string>
@@ -25,4 +25,5 @@
     <string name="initial_boot_delay">20</string>
     <string name="change_account">Change Drive Account:</string>
     <string name="switch_account_button">Switch Account</string>
+    <string name="picture_files_update_rate_minutes">Picture files update rate (minutes):</string>
 </resources>

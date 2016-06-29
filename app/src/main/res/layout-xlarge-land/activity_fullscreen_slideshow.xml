@@ -22,17 +22,15 @@
         <ImageView
             android:id="@+id/im2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/im1" />
+
 
         <ImageView
             android:id="@+id/im3"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <ImageView
-            android:id="@+id/im4"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
 
     </ViewFlipper>
 
@@ -58,10 +56,10 @@
         android:layout_below="@id/my_name"
         android:layout_marginStart="2dp"
         android:background="#627bff"
+        android:gravity="end"
         android:paddingBottom="2dp"
         android:paddingEnd="2dp"
         android:paddingTop="2dp"
-        android:gravity="end"
         android:text="@string/SSDL"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
         android:textColor="#ff836a"
@@ -70,20 +68,28 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="80dp"
-        android:layout_marginTop="2dp"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="2dp"
+        android:layout_marginTop="2dp"
         android:src="@drawable/cs_logo_small" />
 
 
-    <com.example.tpalny.myapplication.ScrollTextView
+    <TextView
         android:id="@+id/my_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Display1"
-        android:textColor="#1a2aff" />
+        android:textColor="#1a2aff"
+        android:textIsSelectable="false" />
 
 
 </RelativeLayout>
 
+    <!--android:focusableInTouchMode="true"
+    android:focusable="true"
+    android:textIsSelectable="false"-->

@@ -121,6 +121,12 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
             Toast.makeText(mContext, "No Text files in folder", Toast.LENGTH_LONG).show();
             Select_Folders.noTextFoundMessageFirstTimeAppearance = false;
 
+        } else {
+            if (mContext instanceof Select_Folders)
+                new Select_Folders.DownloadTask(mContext, Select_Folders.imagesList.size(), true).execute();
+            else
+                new Select_Folders.DownloadTask(mContext, Select_Folders.imagesList.size(), false).execute();
+
         }
     }
 
