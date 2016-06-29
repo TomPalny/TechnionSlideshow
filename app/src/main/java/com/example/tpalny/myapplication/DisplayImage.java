@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.ViewFlipper;
 
 import com.google.api.services.drive.Drive;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.TimerTask;
@@ -16,7 +17,7 @@ import java.util.TimerTask;
 /**
  * Created by tpalny on 20/12/2015.
  */
-public class DisplayImage extends AsyncTask<Void, Void, Bitmap>{
+public class DisplayImage extends AsyncTask<Void, Void, File>{
     protected static int currentPic = 0;
     private Context mContext;
     private ViewFlipper mViewFlipper = FullscreenSlideshow.mViewFlipper;
@@ -26,11 +27,9 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap>{
 
 
     private static final int[] inAnimation = {R.anim.fade_in, R.anim.grow_fade_in_from_bottom,
-            R.anim.popup_enter, R.anim.slide_in_bottom, R.anim.slide_in_top,
-            R.anim.slide_in_from_right};
+            R.anim.popup_enter};
     private static final int[] outAnimation = {R.anim.fade_out, R.anim.shrink_fade_out_from_bottom,
-            R.anim.popup_exit, R.anim.slide_out_top, R.anim.slide_out_bottom,
-            R.anim.slide_out_to_left};
+            R.anim.popup_exit};
 
 
 
@@ -45,18 +44,19 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap>{
     }
 
     @Override
-    protected Bitmap doInBackground(Void... params) {
+    protected File doInBackground(Void... params) {
         File[] files = Select_Folders.myDir.listFiles();
         currentPic = currentPic % files.length;
-        BitmapFactory.Options options = new BitmapFactory.Options();
+        File f = files[currentPic];
+        /*BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(files[currentPic].toString(), options);
 
-
-        final int imageHeight = options.outHeight;
+        int inSampleSize = 1;
+       *//* final int imageHeight = options.outHeight;
         final int imageWidth = options.outWidth;
 
-        int inSampleSize = 1;
+
 
         if (imageHeight > FullscreenSlideshow.heightPixels || imageWidth > FullscreenSlideshow.widthPixels) {
 
@@ -69,22 +69,32 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap>{
                     && (halfWidth / inSampleSize) > FullscreenSlideshow.widthPixels) {
                 inSampleSize *= 2;
             }
-        }
+        }*//*
 
         options.inJustDecodeBounds = false;
         options.inSampleSize = inSampleSize;
         Bitmap bm = null;
-        bm = BitmapFactory.decodeFile(files[currentPic++].toString(), options);
+        while (bm == null) {
+            options.inSampleSize = inSampleSize;
+
+            try {
+                bm = BitmapFactory.decodeFile(files[currentPic].toString(), options);
+            } catch (OutOfMemoryError e) {
+                inSampleSize *= 2;
+            }
+        }*/
+        currentPic++;
         if (currentPic == files.length) currentPic = 0;
 
+        return f;
 
-        return bm;
     }
 
 
+
     @Override
-    protected void onPostExecute(Bitmap bm) {
-        if (currentPic == Select_Folders.myDir.listFiles().length || bm == null) {
+    protected void onPostExecute(File file) {
+        if (currentPic == Select_Folders.myDir.listFiles().length ) {
             FullscreenSlideshow.i = (++FullscreenSlideshow.i) % inAnimation.length;
             /*new SearchTask(mContext, true, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);*/
 
@@ -92,15 +102,18 @@ public class DisplayImage extends AsyncTask<Void, Void, Bitmap>{
             Toast.makeText(mContext, "Internet Connection Lost", Toast.LENGTH_SHORT).show();
         }*/
         if (currentPic % 3 == 0) {
-            im3.setImageBitmap(bm);
+            //im3.setImageBitmap(bm);
+            Picasso.with(mContext).load(file).into(im3);
             mViewFlipper.setDisplayedChild(2);
 
         } else if (currentPic % 3 == 1) {
-            im1.setImageBitmap(bm);
+            //im1.setImageBitmap(bm);
+            Picasso.with(mContext).load(file).into(im1);
             mViewFlipper.setDisplayedChild(0);
 
         } else if (currentPic % 3 == 2) {
-            im2.setImageBitmap(bm);
+            //im2.setImageBitmap(bm);
+            Picasso.with(mContext).load(file).into(im2);
             mViewFlipper.setDisplayedChild(1);
 
         }

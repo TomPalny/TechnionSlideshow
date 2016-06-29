@@ -44,6 +44,7 @@ public class FullscreenSlideshow extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_fullscreen_slideshow);
         settings = getSharedPreferences("com.example.tpalny.myapplication_preferences", Context.MODE_PRIVATE);
         mText = (TextView) findViewById(R.id.my_text);
@@ -56,6 +57,8 @@ public class FullscreenSlideshow extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         heightPixels = metrics.heightPixels;
         widthPixels = metrics.widthPixels;
+
+
         //checking if the device has navigation bar at the bottom before hiding it
         //boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
         boolean hasMenuKey = ViewConfiguration.get(this).hasPermanentMenuKey();
