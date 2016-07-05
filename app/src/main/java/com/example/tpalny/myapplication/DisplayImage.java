@@ -1,6 +1,5 @@
 package com.example.tpalny.myapplication;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,16 +7,12 @@ import android.os.AsyncTask;
 import android.widget.ImageView;
 import android.widget.ViewFlipper;
 
-import com.google.api.services.drive.Drive;
-import com.squareup.picasso.Picasso;
-
 import java.io.File;
-import java.util.TimerTask;
 
 /**
  * Created by tpalny on 20/12/2015.
  */
-public class DisplayImage extends AsyncTask<Void, Void, File>{
+public class DisplayImage extends AsyncTask<Void, Void, Bitmap>{
     protected static int currentPic = 0;
     private Context mContext;
     private ViewFlipper mViewFlipper = FullscreenSlideshow.mViewFlipper;
@@ -44,16 +39,15 @@ public class DisplayImage extends AsyncTask<Void, Void, File>{
     }
 
     @Override
-    protected File doInBackground(Void... params) {
+    protected Bitmap doInBackground(Void... params) {
         File[] files = Select_Folders.myDir.listFiles();
-        currentPic = currentPic % files.length;
-        File f = files[currentPic];
-        /*BitmapFactory.Options options = new BitmapFactory.Options();
+        if (files.length != 0) currentPic = currentPic % files.length;
+        BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(files[currentPic].toString(), options);
 
         int inSampleSize = 1;
-       *//* final int imageHeight = options.outHeight;
+       /* final int imageHeight = options.outHeight;
         final int imageWidth = options.outWidth;
 
 
@@ -69,7 +63,7 @@ public class DisplayImage extends AsyncTask<Void, Void, File>{
                     && (halfWidth / inSampleSize) > FullscreenSlideshow.widthPixels) {
                 inSampleSize *= 2;
             }
-        }*//*
+        }*/
 
         options.inJustDecodeBounds = false;
         options.inSampleSize = inSampleSize;
@@ -82,19 +76,18 @@ public class DisplayImage extends AsyncTask<Void, Void, File>{
             } catch (OutOfMemoryError e) {
                 inSampleSize *= 2;
             }
-        }*/
+        }
         currentPic++;
         if (currentPic == files.length) currentPic = 0;
 
-        return f;
 
+        return bm;
     }
 
 
-
     @Override
-    protected void onPostExecute(File file) {
-        if (currentPic == Select_Folders.myDir.listFiles().length ) {
+    protected void onPostExecute(Bitmap bm) {
+        if (currentPic == Select_Folders.myDir.listFiles().length || bm == null) {
             FullscreenSlideshow.i = (++FullscreenSlideshow.i) % inAnimation.length;
             /*new SearchTask(mContext, true, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);*/
 
@@ -102,18 +95,15 @@ public class DisplayImage extends AsyncTask<Void, Void, File>{
             Toast.makeText(mContext, "Internet Connection Lost", Toast.LENGTH_SHORT).show();
         }*/
         if (currentPic % 3 == 0) {
-            //im3.setImageBitmap(bm);
-            Picasso.with(mContext).load(file).into(im3);
+            im3.setImageBitmap(bm);
             mViewFlipper.setDisplayedChild(2);
 
         } else if (currentPic % 3 == 1) {
-            //im1.setImageBitmap(bm);
-            Picasso.with(mContext).load(file).into(im1);
+            im1.setImageBitmap(bm);
             mViewFlipper.setDisplayedChild(0);
 
         } else if (currentPic % 3 == 2) {
-            //im2.setImageBitmap(bm);
-            Picasso.with(mContext).load(file).into(im2);
+            im2.setImageBitmap(bm);
             mViewFlipper.setDisplayedChild(1);
 
         }

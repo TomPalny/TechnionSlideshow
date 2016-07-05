@@ -33,13 +33,13 @@ public class FullscreenSlideshow extends AppCompatActivity {
     protected static int i = 0;
     private final ScheduledExecutorService textScheduler =
             Executors.newScheduledThreadPool(1);
-    private final ScheduledExecutorService imageScheduler =
-            Executors.newScheduledThreadPool(2);
-    private final ScheduledExecutorService picsRefreshScheduler =
+    protected static final ScheduledExecutorService imageScheduler =
+            Executors.newScheduledThreadPool(1);
+    protected static final ScheduledExecutorService picsRefreshScheduler =
             Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> textUpdateHandle;
-    private ScheduledFuture<?> pictureDisplayHandle;
-    private ScheduledFuture<?> picsFileRefreshHandle;
+    protected static ScheduledFuture<?> pictureDisplayHandle;
+    protected static ScheduledFuture<?> picsFileRefreshHandle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -4,6 +4,7 @@ import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -16,15 +17,11 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -48,11 +45,11 @@ import com.google.api.services.drive.model.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import static android.os.Environment.MEDIA_MOUNTED;
 import static android.os.Environment.getExternalStorageState;
@@ -112,6 +109,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
     protected static String root;
     protected static java.io.File myDir;
     protected static ProgressDialog mProgressDialog;
+    private Timer timerAutoRestart;
 
 
     @Override
@@ -190,6 +188,10 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            if (mContext instanceof FullscreenSlideshow) {
+                FullscreenSlideshow.pictureDisplayHandle.cancel(true);
+                FullscreenSlideshow.picsFileRefreshHandle.cancel(true);
+            }
             if (!getExternalStorageState().equals(MEDIA_MOUNTED)) {
                 cancel(true);
             }
@@ -199,7 +201,12 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 mProgressDialog.setMessage("Downloading files...");
                 mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 mProgressDialog.setIndeterminate(false);
-                mProgressDialog.show();
+                try {
+                    mProgressDialog.show();
+                } catch (Exception e) {
+                    Log.e("Progress Dialog", "can't show progress dialog!");
+                }
+
             }
 
             if (deleteFilesCounter == 2) {
@@ -240,9 +247,11 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                     is = resp.getContent();
 
                     Bitmap bm = BitmapFactory.decodeStream(is);
+
                     FileOutputStream out = new FileOutputStream(file);
                     bm.compress(Bitmap.CompressFormat.JPEG, 95, out);
-                    if (showProgress) publishProgress(count++);
+                    if (showProgress)
+                        publishProgress(count++);
                     out.flush();
                     out.close();
 
@@ -285,7 +294,32 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (showProgress) mProgressDialog.dismiss();
+            if (showProgress)
+                mProgressDialog.dismiss();
+            if (mContext instanceof FullscreenSlideshow) {
+
+                Runnable imageDisplay = new Runnable() {
+                    @Override
+                    public void run() {
+                        new DisplayImage(mContext).execute();
+                    }
+                };
+                Runnable picturesRefresh = new Runnable() {
+                    @Override
+                    public void run() {
+                        new SearchTask(mContext, true, false).execute();
+                    }
+                };
+                Integer picsRefreshTime = Integer.parseInt(pictureFileRefreshRate.getText().toString());
+                Integer delay = Integer.parseInt(slideShowDelay.getText().toString());
+                //restart the pictures slideshow
+                FullscreenSlideshow.pictureDisplayHandle = FullscreenSlideshow.imageScheduler
+                        .scheduleAtFixedRate(imageDisplay, 0, delay, TimeUnit.SECONDS);
+                //restart the picture file refresh timer
+                FullscreenSlideshow.picsFileRefreshHandle = FullscreenSlideshow.picsRefreshScheduler
+                        .scheduleAtFixedRate(picturesRefresh, picsRefreshTime,
+                                picsRefreshTime, TimeUnit.MINUTES);
+            }
             super.onPostExecute(aVoid);
         }
     }
@@ -317,7 +351,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         picturesFolderID = settings.getString(PICTURES_FOLDER_TAG, "");
         textFolderID = settings.getString(TEXT_FOLDER_TAG, "");
 
-        if(!textFolderID.equals("")) isSlideShowWithText = true;
+        if (!textFolderID.equals("")) isSlideShowWithText = true;
 
 
         Boolean userCancelledSlideshow = settings.getBoolean(USER_CANCELLED_SLIDESHOW, true);
@@ -356,25 +390,32 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                     startActivity(intent);
                 }
             };
-            Timer timer = new Timer();
+            timerAutoRestart = new Timer();
             //delaying the start of the slideshow by the amount of seconds
-            timer.schedule(tt, (delayInt * 1000 + 1000));
+            timerAutoRestart.schedule(tt, (delayInt * 1000 + 1000));
         }
     }
 
     private void showToast(Integer delay) {
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setMax(delay);
-        mProgressDialog.setMessage("The slideshow will begin in "+delay +" seconds");
+        mProgressDialog.setMessage("The slideshow will begin in " + delay + " seconds");
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.show();
+        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                timerAutoRestart.cancel();
+                timerAutoRestart.purge();
+            }
+        });
 
-        new CountDownTimer(delay*1000, 10){
+        new CountDownTimer(delay * 1000, 10) {
 
             @Override
             public void onTick(long millisUntilFinished) {
-                mProgressDialog.setProgress((int)(millisUntilFinished/1000));
+                mProgressDialog.setProgress((int) (millisUntilFinished / 1000));
             }
 
             @Override
