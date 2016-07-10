@@ -77,7 +77,7 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
         FileList result = null;
         if (mPicturesFolderId != null) {
             if (mIsImage) {
-                result = mGOOSvc.files().list().setQ("'" + mPicturesFolderId +
+                result = mGOOSvc.files().list().setMaxResults(1000).setQ("'" + mPicturesFolderId +
                         "' in parents and mimeType contains 'image/' and trashed = false")
                         .execute();
             }
