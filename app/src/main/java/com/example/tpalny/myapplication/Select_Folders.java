@@ -173,6 +173,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
         private Context mContext;
         int mListSize;
         Boolean showProgress;
+        Boolean exifFlag = false;
         //this is the number of times download is called before old pics in local storage are
         // checked against the cloud storage in order to delete obsolete local files
         static int deleteFilesCounter = 0;
@@ -249,7 +250,13 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                     Bitmap bm = BitmapFactory.decodeStream(is);
 
                     FileOutputStream out = new FileOutputStream(file);
-                    bm.compress(Bitmap.CompressFormat.JPEG, 95, out);
+                    try {
+
+                        bm.compress(Bitmap.CompressFormat.JPEG, 95, out);
+                    } catch (NullPointerException e) {
+                        Log.e("NullPointerException", "Download cannot complete, try again");
+                        exifFlag = true;
+                    }
                     if (showProgress)
                         publishProgress(count++);
                     out.flush();
@@ -294,6 +301,21 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            if(exifFlag && showProgress){
+                mProgressDialog.dismiss();
+                new AlertDialog.Builder(mContext)
+                        .setMessage("Pictures contain EXIF data, so slideshow cannot start. \n" +
+                                "Please clear ALL EXIF data from pictures and try again.\n" +
+                                "To do so, go to www.imagemagick.org and download ImageMagick,\n" +
+                                "then run the following command from CMD from within the folder of ImageMagick: \n\n" +
+                                "\"mogrify -strip <folder of pictures>\\*.jpg\"\n\n" +
+                                "and upload them again to Google Drive.\n" +
+                                "This command OVERWRITES the current files and strips the EXIF data.\n" +
+                                "Any rotated pictures should be rotated \n" +
+                                "using the following command (overwriting as well):\n\n" +
+                                "\"mogrify -rotate -<degrees> <folder of pictures>\\<name of file>\"").show();
+                return;
+            }
             if (showProgress)
                 mProgressDialog.dismiss();
             if (mContext instanceof FullscreenSlideshow) {
@@ -576,6 +598,7 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                             if (isDeviceOnline()) {
                                 new SearchTask(Select_Folders.this, true, false)
                                         .execute();
+
                             } else {
                                 new AlertDialog.Builder(Select_Folders.this)
                                         .setMessage("No network connection available. " +

@@ -1,6 +1,7 @@
 package com.example.tpalny.myapplication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -123,7 +124,9 @@ class SearchTask extends AsyncTask<Void, Void, Void> {
 
         } else {
             if (mContext instanceof Select_Folders)
+
                 new Select_Folders.DownloadTask(mContext, Select_Folders.imagesList.size(), true).execute();
+
             else
                 new Select_Folders.DownloadTask(mContext, Select_Folders.imagesList.size(), false).execute();
 
