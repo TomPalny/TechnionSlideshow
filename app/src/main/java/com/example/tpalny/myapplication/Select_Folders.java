@@ -304,7 +304,8 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             if(exifFlag && showProgress){
                 mProgressDialog.dismiss();
                 new AlertDialog.Builder(mContext)
-                        .setMessage("Pictures contain EXIF data, so slideshow cannot start. \n" +
+                        .setMessage("Some pictures in the selected folder contain EXIF data, \n" +
+                                "so slideshow cannot start. \n" +
                                 "Please clear ALL EXIF data from pictures and try again.\n" +
                                 "To do so, go to www.ImageMagick.org and download ImageMagick,\n" +
                                 "open  CMD from within the folder, then run the following command:\n\n" +
