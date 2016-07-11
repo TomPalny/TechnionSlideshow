@@ -306,14 +306,14 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
                 new AlertDialog.Builder(mContext)
                         .setMessage("Pictures contain EXIF data, so slideshow cannot start. \n" +
                                 "Please clear ALL EXIF data from pictures and try again.\n" +
-                                "To do so, go to www.imagemagick.org and download ImageMagick,\n" +
-                                "then run the following command from CMD from within the folder of ImageMagick: \n\n" +
-                                "\"mogrify -strip <folder of pictures>\\*.jpg\"\n\n" +
-                                "and upload them again to Google Drive.\n" +
-                                "This command OVERWRITES the current files and strips the EXIF data.\n" +
-                                "Any rotated pictures should be rotated \n" +
-                                "using the following command (overwriting as well):\n\n" +
-                                "\"mogrify -rotate -<degrees> <folder of pictures>\\<name of file>\"").show();
+                                "To do so, go to www.ImageMagick.org and download ImageMagick,\n" +
+                                "open  CMD from within the folder, then run the following command:\n\n" +
+                                "mogrify -auto-orient -strip <folder of pictures>\\*.jpg\n\n" +
+                                "Afterwards, upload them again to Google Drive.\n" +
+                                "This command OVERWRITES the current files, auto-rotates them\n" +
+                                "and then strips the EXIF data.\n" +
+                                "If you don't want to overwrite, check the \"convert\" command \n" +
+                                "documentation instead of \"mogrify\"").show();
                 return;
             }
             if (showProgress)
