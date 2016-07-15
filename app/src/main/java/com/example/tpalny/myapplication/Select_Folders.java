@@ -304,17 +304,24 @@ public class Select_Folders extends FragmentActivity implements GoogleApiClient.
             if(exifFlag && showProgress){
                 mProgressDialog.dismiss();
                 new AlertDialog.Builder(mContext)
-                        .setMessage("Some pictures in the selected folder contain EXIF data, \n" +
-                                "so slideshow cannot start. \n" +
+                        .setMessage("Please pay close attention to the following information:\n" +
+                                "Some pictures in the selected folder contain EXIF metadata, \n" +
+                                "and this device, running an older version of Android, \n" +
+                                "cannot decode those pictures, so the slideshow cannot start.\n" +
                                 "Please clear ALL EXIF data from pictures and try again.\n" +
-                                "To do so, go to www.ImageMagick.org and download ImageMagick,\n" +
-                                "open  CMD from within the folder, then run the following command:\n\n" +
+                                "Here is one way to do so:\n" +
+                                "Go to www.ImageMagick.org and download ImageMagick,\n" +
+                                "extract it and open  CMD from within the folder,\n" +
+                                "then run the following command:\n\n" +
                                 "mogrify -auto-orient -strip <folder of pictures>\\*.jpg\n\n" +
                                 "Afterwards, upload them again to Google Drive.\n" +
-                                "This command OVERWRITES the current files, auto-rotates them\n" +
-                                "and then strips the EXIF data.\n" +
-                                "If you don't want to overwrite, check the \"convert\" command \n" +
-                                "documentation instead of \"mogrify\"").show();
+                                "This command OVERWRITES the files, auto-rotates them\n" +
+                                "and then removes the EXIF metadata.\n" +
+                                "If you don't want to overwrite, use:\n\n" +
+                                "convert -auto-orient -strip <original folder of pictures>\\*.jpg \n" +
+                                "<target folder of pictures>\\%04d.jpg\n\n" +
+                                "or consult the documentation of \"convert\" or \"mogrify\" commands\n" +
+                                "at http://www.imagemagick.org/script/command-line-tools.php").show();
                 return;
             }
             if (showProgress)
