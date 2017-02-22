@@ -8,13 +8,16 @@ Therefore, the pics need to be pre-processed as described below before the app c
                                 Here is one way to do so:
                                 Go to www.ImageMagick.org and download ImageMagick,
                                 extract it and open  CMD from within the folder,
-                                then run the following command:
-                                mogrify -auto-orient -strip <folder of pictures>\*.jpg
+                                then run the following command
+                                (This command OVERWRITES the files, auto-rotates them
+                                and then removes the EXIF metadata):
+                                
+                                mogrify -auto-orient -strip -resize 1920 <folder of pictures>\*.jpg
+                                
                                 Afterwards, upload them again to Google Drive.
-                                This command OVERWRITES the files, auto-rotates them
-                                and then removes the EXIF metadata.
+                                
                                 If you don't want to overwrite, use:
-                                convert -auto-orient -strip <original folder of pictures>\*.jpg 
+                                convert -auto-orient -strip -resize 1920 <original folder of pictures>\*.jpg 
                                 <target folder of pictures>\%04d.jpg
                                 or consult the documentation of "convert" or "mogrify" commands
                                 at http://www.imagemagick.org/script/command-line-tools.php
